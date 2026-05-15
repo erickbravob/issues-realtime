@@ -222,6 +222,18 @@ app.get('/api/health', (req, res) => {
 
 });
 
+app.get('/api/info', (req, res) => {
+
+    res.status(200).json({
+        nombre: 'API REST - Reportes Universitarios',
+        version: '1.0.0',
+        autor: 'Erick Bravo',
+        materia: 'Programación IV',
+        universidad: 'Universidad Privada Domingo Savio'
+    });
+
+});
+
 app.use((req, res) => {
 
     res.status(404).json({
