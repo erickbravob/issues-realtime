@@ -213,6 +213,15 @@ app.delete('/api/reportes/:id', (req, res) => {
 
 });
 
+app.get('/api/health', (req, res) => {
+
+    res.status(200).json({
+        ok: true,
+        mensaje: 'API activa'
+    });
+
+});
+
 app.use((req, res) => {
 
     res.status(404).json({
