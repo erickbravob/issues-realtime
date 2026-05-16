@@ -24,6 +24,14 @@ let reportes = [
         ubicacion: 'Bloque A - Planta baja',
         categoria: 'Servicios básicos',
         estado: 'Pendiente'
+    },
+    {
+        id: 3,
+        titulo: 'Televisor golpeado',
+        descripcion: 'El televisor ha sido golpeado.',
+        ubicacion: 'Bloque D - Planta alta',
+        categoria: 'Servicios de mantenimiento',
+        estado: 'Reparado'
     }
 ];
 
