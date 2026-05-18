@@ -24,14 +24,6 @@ let reportes = [
         ubicacion: 'Bloque A - Planta baja',
         categoria: 'Servicios básicos',
         estado: 'Pendiente'
-    },
-    {
-        id: 3,
-        titulo: 'Televisor golpeado',
-        descripcion: 'El televisor ha sido golpeado.',
-        ubicacion: 'Bloque D - Planta alta',
-        categoria: 'Servicios de mantenimiento',
-        estado: 'Reparado'
     }
 ];
 
@@ -46,9 +38,45 @@ app.get('/', (req, res) => {
 
 app.get('/api/reportes', (req, res) => {
 
+    const { q, estado, categoria, page = 1, limit = 10 } = req.query;
+
+    let resultado = [...reportes];
+
+    if (q) {
+        const textoBusqueda = q.toLowerCase();
+
+        resultado = resultado.filter(reporte =>
+            reporte.titulo.toLowerCase().includes(textoBusqueda) ||
+            reporte.descripcion.toLowerCase().includes(textoBusqueda) ||
+            reporte.ubicacion.toLowerCase().includes(textoBusqueda)
+        );
+    }
+
+    if (estado) {
+        resultado = resultado.filter(reporte =>
+            reporte.estado.toLowerCase() === estado.toLowerCase()
+        );
+    }
+
+    if (categoria) {
+        resultado = resultado.filter(reporte =>
+            reporte.categoria.toLowerCase() === categoria.toLowerCase()
+        );
+    }
+
+    const pagina = parseInt(page);
+    const limite = parseInt(limit);
+    const inicio = (pagina - 1) * limite;
+    const fin = inicio + limite;
+
+    const datosPaginados = resultado.slice(inicio, fin);
+
     res.status(200).json({
         ok: true,
-        data: reportes
+        total: resultado.length,
+        pagina,
+        limite,
+        data: datosPaginados
     });
 
 });
