@@ -2,33 +2,50 @@
 
 Actividad 1 de Programación IV — Universidad Privada Domingo Savio
 
-## Descripción
+---
+
+# Descripción
 
 Esta API REST permite gestionar reportes de problemas de infraestructura universitaria, por ejemplo:
 
-- luminarias quemadas
-- baños dañados
-- equipos rotos
-- problemas eléctricos
-- incidencias de mantenimiento
+* luminarias quemadas
+* baños dañados
+* equipos rotos
+* problemas eléctricos
+* incidencias de mantenimiento
 
-La API fue desarrollada con Node.js y Express siguiendo arquitectura REST.
-
----
-
-## Tecnologías utilizadas
-
-- Node.js
-- Express
-- dotenv
-- Thunder Client
-- GitHub
+La API fue desarrollada con Node.js y Express utilizando arquitectura REST y estructura MVC básica.
 
 ---
 
-## Endpoints
+# Tecnologías utilizadas
 
-### Obtener todos los reportes
+* Node.js
+* Express
+* dotenv
+* Thunder Client
+* Git
+* GitHub
+* Render
+
+---
+
+# Arquitectura del proyecto
+
+```text
+src
+│
+├── controllers
+├── data
+├── routes
+└── server.js
+```
+
+---
+
+# Endpoints principales
+
+## Obtener todos los reportes
 
 GET
 
@@ -38,7 +55,7 @@ GET
 
 ---
 
-### Obtener reporte por ID
+## Obtener reporte por ID
 
 GET
 
@@ -48,7 +65,7 @@ GET
 
 ---
 
-### Crear reporte
+## Crear reporte
 
 POST
 
@@ -58,7 +75,7 @@ POST
 
 ---
 
-### Actualizar reporte
+## Actualizar reporte
 
 PUT
 
@@ -68,7 +85,7 @@ PUT
 
 ---
 
-### Eliminar reporte
+## Eliminar reporte
 
 DELETE
 
@@ -78,16 +95,73 @@ DELETE
 
 ---
 
-## Códigos de respuesta
+# Endpoints adicionales
 
-- 200 OK
-- 201 Created
-- 400 Bad Request
-- 404 Not Found
+## Estado de la API
+
+GET
+
+```http
+/api/health
+```
 
 ---
 
-## Variables de entorno
+## Información de la API
+
+GET
+
+```http
+/api/info
+```
+
+---
+
+# Funcionalidades avanzadas
+
+## Búsqueda
+
+```http
+/api/reportes?q=luminaria
+```
+
+---
+
+## Filtro por estado
+
+```http
+/api/reportes?estado=Pendiente
+```
+
+---
+
+## Filtro por categoría
+
+```http
+/api/reportes?categoria=Iluminación
+```
+
+---
+
+## Paginación
+
+```http
+/api/reportes?page=1&limit=1
+```
+
+---
+
+# Códigos de respuesta HTTP
+
+* 200 OK
+* 201 Created
+* 400 Bad Request
+* 404 Not Found
+* 500 Internal Server Error
+
+---
+
+# Variables de entorno
 
 Archivo `.env`
 
@@ -97,15 +171,15 @@ PORT=3000
 
 ---
 
-## Ejecutar proyecto
+# Instalación del proyecto
 
-Instalar dependencias:
+## Instalar dependencias
 
 ```bash
 npm install
 ```
 
-Ejecutar servidor:
+## Ejecutar servidor
 
 ```bash
 npm start
@@ -113,6 +187,14 @@ npm start
 
 ---
 
-## URL de producción
+# URL de producción
 
 https://actividad-1-api-reportes.onrender.com/api/reportes
+
+---
+
+# Autor
+
+Erick Bravo
+Programación IV
+Universidad Privada Domingo Savio
