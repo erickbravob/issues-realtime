@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./docs/swagger');
+
 const express = require('express');
 
 const reportesRoutes = require('./routes/reportes.routes');
@@ -19,6 +22,8 @@ app.get('/', (req, res) => {
 
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use('/api/reportes', reportesRoutes);
 
 app.get('/api/health', (req, res) => {
@@ -33,7 +38,7 @@ app.get('/api/health', (req, res) => {
 app.get('/api/info', (req, res) => {
 
     res.status(200).json({
-        nombre: 'API REST - Reportes Universitarios',
+        nombre: 'API REST - Reportes de Infraestructura Universitaria',
         version: '1.0.0',
         autor: 'Erick Bravo',
         materia: 'Programación IV',
