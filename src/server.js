@@ -26,6 +26,17 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/reportes', reportesRoutes);
 
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Verificar estado de la API
+ *     tags:
+ *       - Sistema
+ *     responses:
+ *       200:
+ *         description: API activa
+ */
 app.get('/api/health', (req, res) => {
 
     res.status(200).json({
@@ -35,10 +46,21 @@ app.get('/api/health', (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /api/info:
+ *   get:
+ *     summary: Obtener información general de la API
+ *     tags:
+ *       - Sistema
+ *     responses:
+ *       200:
+ *         description: Información de la API
+ */
 app.get('/api/info', (req, res) => {
 
     res.status(200).json({
-        nombre: 'API REST - Reportes de Infraestructura Universitaria',
+        nombre: 'API REST - Reportes Universitarios',
         version: '1.0.0',
         autor: 'Erick Bravo',
         materia: 'Programación IV',

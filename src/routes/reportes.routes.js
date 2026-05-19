@@ -135,28 +135,4 @@ router.put('/:id', actualizarReporte);
  */
 router.delete('/:id', eliminarReporte);
 
-/**
- * @swagger
- * /api/health:
- *   get:
- *     summary: Verificar estado de la API
- *     tags:
- *       - Sistema
- *     responses:
- *       200:
- *         description: API activa
- */
-
-/**
- * @swagger
- * /api/info:
- *   get:
- *     summary: Obtener información general de la API
- *     tags:
- *       - Sistema
- *     responses:
- *       200:
- *         description: Información de la API
- */
-
 module.exports = router;
