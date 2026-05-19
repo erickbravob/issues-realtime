@@ -190,6 +190,7 @@ npm start
 # URL de producción
 
 https://actividad-1-api-reportes.onrender.com/api/reportes
+https://actividad-1-api-reportes.onrender.com/api-docs (Swagger)
 
 ---
 
