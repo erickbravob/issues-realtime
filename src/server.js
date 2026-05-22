@@ -1,6 +1,9 @@
 require('dotenv').config();
 require('./redis/redis.client');
 
+const http = require('http');
+const { Server } = require('socket.io');
+
 const express = require('express');
 const cors = require('cors');
 
@@ -11,8 +14,30 @@ const reportesRoutes = require('./routes/reportes.routes');
 
 const app = express();
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: '*'
+    }
+});
+
+io.on('connection', (socket) => {
+
+    console.log('Cliente conectado a Socket.IO:', socket.id);
+
+    socket.on('disconnect', () => {
+        console.log('Cliente desconectado de Socket.IO:', socket.id);
+    });
+
+});
+
+app.set('io', io);
+
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -90,7 +115,7 @@ app.use((err, req, res, next) => {
 
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
 
     console.log(`Servidor ejecutándose en puerto ${PORT}`);
 

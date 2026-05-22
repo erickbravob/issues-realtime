@@ -102,6 +102,15 @@ const crearReporte = async (req, res) => {
         nuevoReporte
     );
 
+    const io = req.app.get('io');
+
+    io.emit('reporte:creado', {
+        tipo: 'infra:reporte:creado',
+        payload: nuevoReporte,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    });
+
     res.status(201).json({
         ok: true,
         mensaje: 'Reporte creado correctamente',
