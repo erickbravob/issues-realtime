@@ -1,4 +1,6 @@
 const { reportes } = require('../data/reportes.data');
+const { publicarEvento } = require('../redis/redis.publisher');
+
 
 const listarReportes = (req, res) => {
 
@@ -65,15 +67,23 @@ const obtenerReportePorId = (req, res) => {
 
 };
 
-const crearReporte = (req, res) => {
+const crearReporte = async (req, res) => {
 
-    const { titulo, descripcion, ubicacion, categoria, estado } = req.body;
+    const {
+        titulo,
+        descripcion,
+        ubicacion,
+        categoria,
+        estado
+    } = req.body;
 
     if (!titulo || !descripcion || !ubicacion || !categoria || !estado) {
+
         return res.status(400).json({
             ok: false,
             mensaje: 'Todos los campos son obligatorios'
         });
+
     }
 
     const nuevoReporte = {
@@ -86,6 +96,11 @@ const crearReporte = (req, res) => {
     };
 
     reportes.push(nuevoReporte);
+
+    await publicarEvento(
+        'infra:reporte:creado',
+        nuevoReporte
+    );
 
     res.status(201).json({
         ok: true,

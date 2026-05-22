@@ -1,6 +1,9 @@
 require('dotenv').config();
+require('./redis/redis.client');
 
 const express = require('express');
+const cors = require('cors');
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./docs/swagger');
 
@@ -8,6 +11,7 @@ const reportesRoutes = require('./routes/reportes.routes');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
