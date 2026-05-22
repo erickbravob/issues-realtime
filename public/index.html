@@ -67,7 +67,7 @@
             estado.textContent = 'Desconectado del servidor';
         });
 
-        socket.on('reporte:creado', (evento) => {
+        function mostrarNotificacion(tituloEvento, evento) {
 
             const reporte = evento.payload;
 
@@ -75,7 +75,7 @@
             div.className = 'notificacion';
 
             div.innerHTML = `
-                <div class="titulo">Nuevo reporte: ${reporte.titulo}</div>
+                <div class="titulo">${tituloEvento}: ${reporte.titulo}</div>
                 <div class="detalle"><strong>Descripción:</strong> ${reporte.descripcion}</div>
                 <div class="detalle"><strong>Ubicación:</strong> ${reporte.ubicacion}</div>
                 <div class="detalle"><strong>Categoría:</strong> ${reporte.categoria}</div>
@@ -85,6 +85,18 @@
 
             contenedor.prepend(div);
 
+        }
+
+        socket.on('reporte:creado', (evento) => {
+            mostrarNotificacion('Nuevo reporte creado', evento);
+        });
+
+        socket.on('reporte:actualizado', (evento) => {
+            mostrarNotificacion('Reporte actualizado', evento);
+        });
+
+        socket.on('reporte:eliminado', (evento) => {
+            mostrarNotificacion('Reporte eliminado', evento);
         });
     </script>
 

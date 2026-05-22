@@ -6,7 +6,12 @@ const subscriber = new Redis(process.env.REDIS_URL, {
     tls: {}
 });
 
-subscriber.subscribe('infra:reportes', (error, count) => {
+const canales = [
+    'infra:reportes',
+    'infra:notificaciones'
+];
+
+subscriber.subscribe(...canales, (error, count) => {
 
     if (error) {
 
@@ -16,16 +21,20 @@ subscriber.subscribe('infra:reportes', (error, count) => {
 
     }
 
-    console.log(`Suscrito a ${count} canal(es)`);
+    console.log(`Suscrito a ${count} canal(es): ${canales.join(', ')}`);
 
 });
 
 subscriber.on('message', (canal, mensaje) => {
 
+    const evento = JSON.parse(mensaje);
+
     console.log('--------------------------------');
     console.log('Canal:', canal);
-    console.log('Mensaje recibido:');
-    console.log(mensaje);
+    console.log('Tipo:', evento.tipo);
+    console.log('Timestamp:', evento.timestamp);
+    console.log('Versión:', evento.version);
+    console.log('Payload:', evento.payload);
     console.log('--------------------------------');
 
 });

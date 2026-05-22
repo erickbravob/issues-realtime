@@ -1,7 +1,6 @@
 const { reportes } = require('../data/reportes.data');
 const { publicarEvento } = require('../redis/redis.publisher');
 
-
 const listarReportes = (req, res) => {
 
     const { q, estado, categoria, page = 1, limit = 10 } = req.query;
@@ -98,8 +97,18 @@ const crearReporte = async (req, res) => {
     reportes.push(nuevoReporte);
 
     await publicarEvento(
+        'infra:reportes',
         'infra:reporte:creado',
         nuevoReporte
+    );
+
+    await publicarEvento(
+        'infra:notificaciones',
+        'infra:notificacion:mantenimiento',
+        {
+            mensaje: 'Nuevo reporte de infraestructura registrado',
+            reporte: nuevoReporte
+        }
     );
 
     const io = req.app.get('io');
@@ -119,26 +128,36 @@ const crearReporte = async (req, res) => {
 
 };
 
-const actualizarReporte = (req, res) => {
+const actualizarReporte = async (req, res) => {
 
     const id = parseInt(req.params.id);
 
     const reporte = reportes.find(r => r.id === id);
 
     if (!reporte) {
+
         return res.status(404).json({
             ok: false,
             mensaje: 'Reporte no encontrado'
         });
+
     }
 
-    const { titulo, descripcion, ubicacion, categoria, estado } = req.body;
+    const {
+        titulo,
+        descripcion,
+        ubicacion,
+        categoria,
+        estado
+    } = req.body;
 
     if (!titulo || !descripcion || !ubicacion || !categoria || !estado) {
+
         return res.status(400).json({
             ok: false,
             mensaje: 'Todos los campos son obligatorios'
         });
+
     }
 
     reporte.titulo = titulo;
@@ -146,6 +165,30 @@ const actualizarReporte = (req, res) => {
     reporte.ubicacion = ubicacion;
     reporte.categoria = categoria;
     reporte.estado = estado;
+
+    await publicarEvento(
+        'infra:reportes',
+        'infra:reporte:actualizado',
+        reporte
+    );
+
+    await publicarEvento(
+        'infra:notificaciones',
+        'infra:notificacion:mantenimiento',
+        {
+            mensaje: 'Reporte de infraestructura actualizado',
+            reporte
+        }
+    );
+
+    const io = req.app.get('io');
+
+    io.emit('reporte:actualizado', {
+        tipo: 'infra:reporte:actualizado',
+        payload: reporte,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    });
 
     res.status(200).json({
         ok: true,
@@ -155,24 +198,53 @@ const actualizarReporte = (req, res) => {
 
 };
 
-const eliminarReporte = (req, res) => {
+const eliminarReporte = async (req, res) => {
 
     const id = parseInt(req.params.id);
 
     const indice = reportes.findIndex(r => r.id === id);
 
     if (indice === -1) {
+
         return res.status(404).json({
             ok: false,
             mensaje: 'Reporte no encontrado'
         });
+
     }
+
+    const reporteEliminado = reportes[indice];
 
     reportes.splice(indice, 1);
 
+    await publicarEvento(
+        'infra:reportes',
+        'infra:reporte:eliminado',
+        reporteEliminado
+    );
+
+    await publicarEvento(
+        'infra:notificaciones',
+        'infra:notificacion:mantenimiento',
+        {
+            mensaje: 'Reporte de infraestructura eliminado',
+            reporte: reporteEliminado
+        }
+    );
+
+    const io = req.app.get('io');
+
+    io.emit('reporte:eliminado', {
+        tipo: 'infra:reporte:eliminado',
+        payload: reporteEliminado,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    });
+
     res.status(200).json({
         ok: true,
-        mensaje: 'Reporte eliminado correctamente'
+        mensaje: 'Reporte eliminado correctamente',
+        data: reporteEliminado
     });
 
 };

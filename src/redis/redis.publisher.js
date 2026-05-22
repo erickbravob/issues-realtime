@@ -1,6 +1,6 @@
 const redis = require('./redis.client');
 
-const publicarEvento = async (tipo, payload) => {
+const publicarEvento = async (canal, tipo, payload) => {
 
     const evento = {
         tipo,
@@ -10,7 +10,7 @@ const publicarEvento = async (tipo, payload) => {
     };
 
     await redis.publish(
-        'infra:reportes',
+        canal,
         JSON.stringify(evento)
     );
 
