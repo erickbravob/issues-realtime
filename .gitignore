@@ -1,3 +1,4 @@
 node_modules
 .env
 Actividad_0
+/src/generated/prisma
