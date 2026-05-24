@@ -1,44 +1,38 @@
-# API REST — Sistema de Reportes de Infraestructura Universitaria
+API REST — Sistema de Reportes de Infraestructura Universitaria
 
-Proyecto desarrollado para la materia **Programación IV** de la **Universidad Privada Domingo Savio (UPDS)**.
+Proyecto desarrollado para la materia Programación IV de la Universidad Privada Domingo Savio (UPDS).
 
-El sistema implementa una arquitectura distribuida basada en API REST, PostgreSQL en la nube, Redis Pub/Sub y notificaciones en tiempo real mediante Socket.IO, tomando como referencia la arquitectura propuesta en el texto guía de StudySync adaptada al proyecto final de infraestructura universitaria. :contentReference[oaicite:0]{index=0}
+El sistema implementa una arquitectura distribuida basada en API REST, PostgreSQL cloud, Redis Pub/Sub, caché distribuido y notificaciones en tiempo real mediante Socket.IO, tomando como referencia la arquitectura propuesta en el texto guía de StudySync adaptada al proyecto final de infraestructura universitaria.
 
----
-
-# Descripción
+Descripción
 
 El sistema permite registrar, consultar, actualizar y eliminar reportes relacionados con problemas de infraestructura universitaria, tales como:
 
-- luminarias dañadas,
-- fugas de agua,
-- cableado defectuoso,
-- problemas eléctricos,
-- daños en aulas,
-- mantenimiento institucional.
+luminarias dañadas,
+fugas de agua,
+cableado defectuoso,
+problemas eléctricos,
+daños en aulas,
+mantenimiento institucional.
 
 Además, el sistema implementa comunicación en tiempo real utilizando Redis Pub/Sub y Socket.IO, permitiendo que los eventos generados por la API sean enviados automáticamente a clientes conectados desde navegador.
 
----
+El proyecto fue evolucionando incrementalmente por actividades académicas hasta convertirse en la base arquitectónica del proyecto final de Programación IV.
 
-# Tecnologías utilizadas
-
-| Tecnología | Uso en el sistema |
-|------------|-------------------|
-| Node.js + Express | API REST y servidor backend |
-| Prisma ORM | Acceso y modelado de base de datos |
-| Supabase PostgreSQL | Persistencia cloud de datos |
-| Upstash Redis | Redis Pub/Sub distribuido |
-| Socket.IO | Comunicación en tiempo real |
-| Swagger/OpenAPI | Documentación interactiva |
-| dotenv | Variables de entorno |
-| Git y GitHub | Control de versiones |
-| Render | Despliegue en producción |
-
----
-
-# Arquitectura del sistema
-
+Tecnologías utilizadas
+Tecnología	Uso en el sistema
+Node.js + Express	API REST y servidor backend
+Prisma ORM	Acceso y modelado de base de datos
+Supabase PostgreSQL	Persistencia cloud de datos
+Upstash Redis	Redis Pub/Sub y caché
+Socket.IO	Comunicación en tiempo real
+Swagger/OpenAPI	Documentación interactiva
+Jest + Supertest	Pruebas automatizadas
+dotenv	Variables de entorno
+Git y GitHub	Control de versiones
+Render	Despliegue cloud
+Docker (planificado)	Contenerización futura
+Arquitectura del sistema
 Cliente Web / Swagger
         ↓
 API REST Express
@@ -55,13 +49,15 @@ Navegador en tiempo real
 
 La arquitectura implementada sigue el enfoque distribuido propuesto por el texto guía de Programación IV, integrando API REST, Redis Pub/Sub y base de datos cloud dentro de una misma solución cohesiva.
 
-Estructura del proyecto:
-
+Estructura del proyecto
 ACTIVIDAD_1/
 │
 ├── prisma/
 │   ├── migrations/
 │   └── schema.prisma
+│
+├── pruebas/
+│   └── api.prueba.js
 │
 ├── public/
 │   └── index.html
@@ -84,13 +80,13 @@ ACTIVIDAD_1/
 │   ├── routes/
 │   │   └── reportes.routes.js
 │   │
+│   ├── app.js
 │   └── server.js
 │
 ├── .env
 ├── .gitignore
 ├── package.json
 └── README.md
-
 Modelo de datos
 Usuario
 
@@ -126,6 +122,18 @@ usuarioId
 categoriaId
 createdAt
 updatedAt
+SeguimientoReporte
+
+Representa el historial y seguimiento de atención de un reporte.
+
+Campos principales:
+
+id
+detalle
+responsable
+fecha
+reporteId
+createdAt
 Funcionalidades implementadas
 
 ✅ CRUD completo de reportes
@@ -143,6 +151,10 @@ Funcionalidades implementadas
 ✅ Eventos tipados JSON
 ✅ Caché Redis para lecturas frecuentes
 ✅ Invalidación automática de caché
+✅ Seguimiento de reportes en tiempo real
+✅ Cambio de estado independiente mediante PATCH
+✅ Eventos Socket.IO para seguimiento y actualización de estado
+✅ Pruebas automatizadas para endpoints críticos
 ✅ Pruebas automatizadas con Jest y Supertest
 
 Endpoints principales
@@ -151,15 +163,13 @@ GET	/api/reportes	Listar reportes
 GET	/api/reportes/:id	Obtener reporte por ID
 POST	/api/reportes	Crear reporte
 PUT	/api/reportes/:id	Actualizar reporte
+PATCH	/api/reportes/:id/estado	Actualizar estado del reporte
 DELETE	/api/reportes/:id	Eliminar reporte
+POST	/api/reportes/seguimiento/:id	Registrar seguimiento
 GET	/api/health	Estado de la API
 GET	/api/info	Información del sistema
 GET	/api-docs	Swagger/OpenAPI
-
-La estructura CRUD implementada sigue la consigna oficial de Programación IV utilizando los verbos HTTP correctos y manejo de errores mediante códigos 200, 201, 400 y 404.
-
-Ejemplo POST /api/reportes:
-
+Ejemplo POST /api/reportes
 {
   "titulo": "Fuga de agua en baño",
   "descripcion": "Se detectó una fuga de agua en el lavamanos del baño de estudiantes.",
@@ -169,15 +179,24 @@ Ejemplo POST /api/reportes:
   "usuarioNombre": "Erick Bravo",
   "usuarioEmail": "erick@upds.edu.bo"
 }
-
-Búsqueda: GET /api/reportes?q=agua
-Filtro por estado: GET /api/reportes?estado=Pendiente
-Filtro por categoría: GET /api/reportes?categoria=Servicios básicos
-Paginación: GET /api/reportes?page=1&limit=10
+Ejemplo PATCH /api/reportes/:id/estado
+{
+  "estado": "Atendido"
+}
+Ejemplo POST /api/reportes/seguimiento/:id
+{
+  "detalle": "Personal de mantenimiento verificó el aula y programó la reparación.",
+  "responsable": "Unidad de Mantenimiento"
+}
+Búsquedas y filtros
+GET /api/reportes?q=agua
+GET /api/reportes?estado=Pendiente
+GET /api/reportes?categoria=Servicios básicos
+GET /api/reportes?page=1&limit=10
 
 Estas funcionalidades permiten alcanzar el nivel estratégico definido en la rúbrica oficial mediante búsqueda, filtros y paginación implementados en la API.
 
-# Redis Pub/Sub
+Redis Pub/Sub
 
 El sistema utiliza Redis Pub/Sub mediante Upstash Redis para enviar eventos en tiempo real cuando se crean, actualizan o eliminan reportes.
 
@@ -188,6 +207,8 @@ Eventos implementados
 infra:reporte:creado
 infra:reporte:actualizado
 infra:reporte:eliminado
+infra:reporte:seguimiento_creado
+infra:reporte:estado_actualizado
 infra:notificacion:mantenimiento
 Estructura JSON de eventos
 {
@@ -202,42 +223,43 @@ Estructura JSON de eventos
 
 La integración Redis + Base de Datos permite que cada operación realizada sobre PostgreSQL dispare automáticamente eventos Pub/Sub, cumpliendo la arquitectura distribuida requerida por la Actividad 3.
 
-Además del patrón Pub/Sub, Redis también fue utilizado como sistema de caché para optimizar consultas frecuentes del endpoint GET /api/reportes.
+Redis Cache
 
-La estrategia implementada consiste en:
+Además del patrón Pub/Sub, Redis también fue utilizado como sistema de caché para optimizar consultas frecuentes del endpoint:
 
-- Guardar respuestas GET frecuentes en Redis.
-- Reutilizar caché cuando la consulta ya existe.
-- Invalidar automáticamente la caché cuando ocurre POST, PUT o DELETE.
+GET /api/reportes
+Estrategia implementada
+Guardar respuestas GET frecuentes en Redis.
+Reutilizar caché cuando la consulta ya existe.
+Invalidar automáticamente la caché cuando ocurre POST, PUT, PATCH o DELETE.
 
 Esto reduce consultas repetitivas a PostgreSQL y mejora el rendimiento general de la API.
 
 Socket.IO y tiempo real
 
-Socket.IO fue integrado para mostrar eventos en tiempo real en el navegador.
+Socket.IO fue integrado para mostrar eventos en tiempo real en navegador.
 
-Eventos emitidos:
-
+Eventos emitidos
 reporte:creado
 reporte:actualizado
 reporte:eliminado
-
-Panel tiempo real:
-
+reporte:seguimiento_creado
+reporte:estado_actualizado
+Panel tiempo real
 GET /
 Variables de entorno
 
-Archivo .env:
+Archivo .env
 
 PORT=3000
 
-REDIS_URL=redis://default:"Pass"@"Host"_REDIS:6379
+REDIS_URL=redis://default:"PASSWORD"@"HOST_REDIS":6379
 
-DATABASE_URL=postgresql://postgres:"Pass"@"Host"_SUPABASE:6543/postgres?pgbouncer=true
+DATABASE_URL=postgresql://postgres:"PASSWORD"@"HOST_SUPABASE":6543/postgres?pgbouncer=true
 
-DIRECT_URL=postgresql://postgres:"Pass"@"Host"_SUPABASE:5432/postgres
+DIRECT_URL=postgresql://postgres:"PASSWORD"@"HOST_SUPABASE":5432/postgres
 
-Las variables de entorno permiten separar credenciales sensibles del código fuente principal siguiendo las recomendaciones de la guía y las buenas prácticas de despliegue cloud.
+Las variables de entorno permiten separar credenciales sensibles del código fuente principal siguiendo las recomendaciones de despliegue cloud.
 
 Instalación local
 Instalar dependencias
@@ -269,7 +291,9 @@ La API fue desplegada en Render configurando variables de entorno y verificando 
 
 Persistencia cloud
 
-Inicialmente el sistema utilizaba almacenamiento temporal en memoria mediante arreglos JavaScript. Posteriormente, durante la Actividad 3, la arquitectura evolucionó hacia persistencia real utilizando Supabase PostgreSQL y Prisma ORM.
+Inicialmente el sistema utilizaba almacenamiento temporal en memoria mediante arreglos JavaScript.
+
+Posteriormente, durante la Actividad 3, la arquitectura evolucionó hacia persistencia real utilizando Supabase PostgreSQL y Prisma ORM.
 
 Actualmente:
 
@@ -293,28 +317,112 @@ Validaciones implementadas
 ✅ Persistencia real en Supabase
 ✅ Comunicación realtime Socket.IO
 
-# Pruebas automatizadas
+Pruebas automatizadas
 
-El sistema implementa pruebas básicas de integración utilizando Jest y Supertest.
+El sistema implementa pruebas automatizadas utilizando Jest y Supertest.
 
-Endpoints probados:
-
-- GET /api/health
-- GET /api/info
-- GET /api/reportes
-
-Ejecución de pruebas:
-
+Endpoints validados
+GET /api/health
+GET /api/info
+GET /api/reportes
+PATCH /api/reportes/:id/estado
+Las pruebas verifican
+Integración completa con Express
+Persistencia en PostgreSQL
+Operaciones Prisma ORM
+Endpoints REST
+Flujo de actualización de estado
+Respuestas HTTP correctas
+Ejecución
 npm test
-
-Resultado esperado:
-
+Resultado esperado
 PASS pruebas/api.prueba.js
-3 passed
+4 passed
 0 failed
 
 Las pruebas automatizadas permiten validar el funcionamiento básico de la API y garantizan estabilidad en los endpoints principales.
 
+Docker y despliegue cloud
+
+La aplicación fue preparada para futura contenerización mediante Docker, permitiendo despliegue portable en entornos cloud como:
+
+AWS EC2 Free Tier
+Render
+VPS Linux
+Docker Desktop
+Próximamente
+Dockerfile
+docker-compose
+despliegue automatizado
+integración cloud
+Versionado del proyecto
+
+El proyecto fue desarrollado incrementalmente por actividades académicas utilizando versionado evolutivo basado en funcionalidades implementadas.
+
+Actividad 1 — v1.0.0
+
+Implementación inicial de la API REST:
+
+CRUD básico de reportes
+Express.js
+Swagger/OpenAPI
+Arquitectura MVC
+Endpoints REST
+Variables de entorno
+Deploy inicial en Render
+Mejoras posteriores
+v1.1.0
+Búsqueda y filtros
+Paginación
+Mejoras de validación
+v1.2.0
+Caché Redis
+Invalidación automática
+Optimización GET /api/reportes
+Actividad 2 — v2.0.0
+
+Integración de comunicación distribuida:
+
+Redis Pub/Sub
+Eventos JSON estructurados
+Subscriber independiente
+Eventos en tiempo real
+Mejoras posteriores
+v2.1.0
+Socket.IO realtime
+Panel de notificaciones web
+Eventos tipados
+Mejoras de sincronización
+Actividad 3 — v3.0.0
+
+Persistencia cloud y arquitectura avanzada:
+
+Prisma ORM
+Supabase PostgreSQL
+Migraciones
+Persistencia real cloud
+Relaciones entre entidades
+Cache distribuido Redis
+Endpoint seguimiento
+Endpoint PATCH estado
+Pruebas automatizadas Jest/Supertest
+Mejoras posteriores
+v3.1.0
+Seguimiento realtime
+Actualización de estado realtime
+Optimización de pruebas
+Mejoras Swagger/OpenAPI
+Próxima evolución — Actividad 4 (v4.0.0)
+
+Planificado:
+
+JWT Authentication
+Roles y permisos
+Middleware de seguridad
+CORS avanzado
+Protección de endpoints
+Validación avanzada
+Seguridad API REST
 Commits semánticos implementados
 
 Ejemplos de commits utilizados:
@@ -324,7 +432,8 @@ feat: agregar swagger a la API
 feat: implementar redis pubsub en produccion
 feat: agregar socket io para tiempo real
 feat: integrar prisma con supabase
-docs: actualizar readme con supabase redis y socket io
+feat: agregar endpoints practicos de seguimiento y cambio de estado
+docs: actualizar readme con endpoints avanzados y pruebas
 fix: corregir configuracion prisma client
 
 El historial Git utiliza commits semánticos siguiendo las recomendaciones de la guía y la rúbrica oficial.
@@ -332,7 +441,9 @@ El historial Git utiliza commits semánticos siguiendo las recomendaciones de la
 Decisiones técnicas
 ¿Por qué PostgreSQL y no memoria?
 
-El almacenamiento en memoria pierde información al reiniciar el servidor. PostgreSQL garantiza persistencia real, relaciones entre tablas y escalabilidad.
+El almacenamiento en memoria pierde información al reiniciar el servidor.
+
+PostgreSQL garantiza persistencia real, relaciones entre tablas y escalabilidad.
 
 ¿Por qué Redis además de PostgreSQL?
 
@@ -346,9 +457,9 @@ Prisma simplifica el acceso a PostgreSQL mediante modelos tipados, migraciones a
 
 Socket.IO permite actualizar la interfaz web automáticamente sin necesidad de recargar el navegador.
 
-Autor:
+Autor
 
-Erick Bravo Borges,
-Programación IV,
-Universidad Privada Domingo Savio,
-Gestión 2026.
+Erick Bravo Borges
+Programación IV
+Universidad Privada Domingo Savio
+Gestión 2026
