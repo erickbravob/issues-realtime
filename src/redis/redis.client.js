@@ -47,6 +47,101 @@ const validarConexionRedis = async () => {
 
 };
 
+const guardarCache = async (clave, datos, expiracion = 60) => {
+
+    try {
+
+        await redis.set(
+            clave,
+            JSON.stringify(datos),
+            'EX',
+            expiracion
+        );
+
+        console.log(`Cache guardado: ${clave}`);
+
+    } catch (error) {
+
+        console.error('Error guardando cache:', error.message);
+
+    }
+
+};
+
+const obtenerCache = async (clave) => {
+
+    try {
+
+        const datos = await redis.get(clave);
+
+        if (!datos) {
+
+            return null;
+
+        }
+
+        console.log(`Cache encontrado: ${clave}`);
+
+        return JSON.parse(datos);
+
+    } catch (error) {
+
+        console.error('Error obteniendo cache:', error.message);
+
+        return null;
+
+    }
+
+};
+
+const eliminarCache = async (clave) => {
+
+    try {
+
+        await redis.del(clave);
+
+        console.log(`Cache eliminado: ${clave}`);
+
+    } catch (error) {
+
+        console.error('Error eliminando cache:', error.message);
+
+    }
+
+};
+
+const eliminarCachePorPatron = async (patron) => {
+
+    try {
+
+        const claves = await redis.keys(patron);
+
+        if (claves.length === 0) {
+
+            console.log(`No hay claves de cache para eliminar con patrón: ${patron}`);
+
+            return;
+
+        }
+
+        await redis.del(claves);
+
+        console.log(`Cache eliminado por patrón: ${patron}`);
+
+    } catch (error) {
+
+        console.error('Error eliminando cache por patrón:', error.message);
+
+    }
+
+};
+
 validarConexionRedis();
 
-module.exports = redis;
+module.exports = {
+    redis,
+    guardarCache,
+    obtenerCache,
+    eliminarCache,
+    eliminarCachePorPatron
+};

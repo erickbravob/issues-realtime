@@ -1,4 +1,4 @@
-const redis = require('./redis.client');
+const { redis } = require('./redis.client');
 
 const publicarEvento = async (canal, tipo, payload) => {
 

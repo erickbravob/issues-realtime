@@ -1,9 +1,29 @@
 const prisma = require('../config/prisma.client');
 const { publicarEvento } = require('../redis/redis.publisher');
 
+const {
+    guardarCache,
+    obtenerCache,
+    eliminarCachePorPatron
+} = require('../redis/redis.client');
+
 const listarReportes = async (req, res) => {
 
     const { q, estado, categoria, page = 1, limit = 10 } = req.query;
+
+    const claveCache = `reportes:${q || 'all'}:${estado || 'all'}:${categoria || 'all'}:${page}:${limit}`;
+
+    const datosCache = await obtenerCache(claveCache);
+
+    if (datosCache) {
+
+        return res.status(200).json({
+            ok: true,
+            cache: true,
+            ...datosCache
+        });
+
+    }
 
     const pagina = parseInt(page);
     const limite = parseInt(limit);
@@ -67,12 +87,19 @@ const listarReportes = async (req, res) => {
         }
     });
 
-    res.status(200).json({
-        ok: true,
+    const respuesta = {
         total,
         pagina,
         limite,
         data: reportes
+    };
+
+    await guardarCache(claveCache, respuesta, 60);
+
+    res.status(200).json({
+        ok: true,
+        cache: false,
+        ...respuesta
     });
 
 };
@@ -165,6 +192,8 @@ const crearReporte = async (req, res) => {
             categoria: true
         }
     });
+
+    await eliminarCachePorPatron('reportes:*');
 
     await publicarEvento(
         'infra:reportes',
@@ -261,6 +290,8 @@ const actualizarReporte = async (req, res) => {
         }
     });
 
+    await eliminarCachePorPatron('reportes:*');
+
     await publicarEvento(
         'infra:reportes',
         'infra:reporte:actualizado',
@@ -321,6 +352,8 @@ const eliminarReporte = async (req, res) => {
             id
         }
     });
+
+    await eliminarCachePorPatron('reportes:*');
 
     await publicarEvento(
         'infra:reportes',
