@@ -124,6 +124,10 @@
         socket.on('reporte:seguimiento_creado', (evento) => {
             mostrarNotificacionSeguimiento('Seguimiento registrado', evento);
         });
+
+        socket.on('reporte:estado_actualizado', (evento) => {
+            mostrarNotificacionReporte('Estado del reporte actualizado', evento);
+        }); 
     </script>
 
 </body>

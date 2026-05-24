@@ -48,6 +48,16 @@ subscriber.on('pmessage', (patron, canal, mensaje) => {
             console.log('Reporte eliminado');
             break;
 
+        case 'infra:reporte:estado_actualizado':
+
+            console.log('Estado Actualizado');
+            break;
+        
+        case 'infra:reporte:seguimiento_creado':
+
+            console.log('Seguimiento creado');
+            break;
+        
         default:
 
             console.log('Evento no identificado');

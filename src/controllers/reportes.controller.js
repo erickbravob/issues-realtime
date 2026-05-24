@@ -212,12 +212,16 @@ const crearReporte = async (req, res) => {
 
     const io = req.app.get('io');
 
-    io.emit('reporte:creado', {
-        tipo: 'infra:reporte:creado',
-        payload: nuevoReporte,
-        timestamp: new Date().toISOString(),
-        version: '1.0'
-    });
+    if (io) {
+
+        io.emit('reporte:creado', {
+            tipo: 'infra:reporte:creado',
+            payload: nuevoReporte,
+            timestamp: new Date().toISOString(),
+            version: '1.0'
+        });
+
+    }
 
     res.status(201).json({
         ok: true,
@@ -309,12 +313,16 @@ const actualizarReporte = async (req, res) => {
 
     const io = req.app.get('io');
 
-    io.emit('reporte:actualizado', {
-        tipo: 'infra:reporte:actualizado',
-        payload: reporte,
-        timestamp: new Date().toISOString(),
-        version: '1.0'
-    });
+    if (io) {
+
+        io.emit('reporte:actualizado', {
+            tipo: 'infra:reporte:actualizado',
+            payload: reporte,
+            timestamp: new Date().toISOString(),
+            version: '1.0'
+        });
+
+    }
 
     res.status(200).json({
         ok: true,
@@ -372,12 +380,16 @@ const eliminarReporte = async (req, res) => {
 
     const io = req.app.get('io');
 
-    io.emit('reporte:eliminado', {
-        tipo: 'infra:reporte:eliminado',
-        payload: reporteExiste,
-        timestamp: new Date().toISOString(),
-        version: '1.0'
-    });
+    if (io) {
+
+        io.emit('reporte:eliminado', {
+            tipo: 'infra:reporte:eliminado',
+            payload: reporteExiste,
+            timestamp: new Date().toISOString(),
+            version: '1.0'
+        });
+
+    }    
 
     res.status(200).json({
         ok: true,
@@ -459,17 +471,108 @@ const crearSeguimientoReporte = async (req, res) => {
 
     const io = req.app.get('io');
 
-    io.emit('reporte:seguimiento_creado', {
-        tipo: 'infra:reporte:seguimiento_creado',
-        payload: seguimiento,
-        timestamp: new Date().toISOString(),
-        version: '1.0'
-    });
+    if (io) {
+
+        io.emit('reporte:seguimiento_creado', {
+            tipo: 'infra:reporte:seguimiento_creado',
+            payload: seguimiento,
+            timestamp: new Date().toISOString(),
+            version: '1.0'
+        });
+
+    }
 
     res.status(201).json({
         ok: true,
         mensaje: 'Seguimiento registrado correctamente',
         data: seguimiento
+    });
+
+};
+
+const actualizarEstadoReporte = async (req, res) => {
+
+    const id = parseInt(req.params.id);
+
+    const {
+        estado
+    } = req.body;
+
+    if (!estado) {
+
+        return res.status(400).json({
+            ok: false,
+            mensaje: 'El estado es obligatorio'
+        });
+
+    }
+
+    const reporteExiste = await prisma.reporte.findUnique({
+        where: {
+            id
+        },
+        include: {
+            usuario: true,
+            categoria: true
+        }
+    });
+
+    if (!reporteExiste) {
+
+        return res.status(404).json({
+            ok: false,
+            mensaje: 'Reporte no encontrado'
+        });
+
+    }
+
+    const reporteActualizado = await prisma.reporte.update({
+        where: {
+            id
+        },
+        data: {
+            estado
+        },
+        include: {
+            usuario: true,
+            categoria: true
+        }
+    });
+
+    await eliminarCachePorPatron('reportes:*');
+
+    await publicarEvento(
+        'infra:reportes',
+        'infra:reporte:estado_actualizado',
+        reporteActualizado
+    );
+
+    await publicarEvento(
+        'infra:notificaciones',
+        'infra:notificacion:mantenimiento',
+        {
+            mensaje: 'Estado del reporte actualizado',
+            reporte: reporteActualizado
+        }
+    );
+
+    const io = req.app.get('io');
+
+    if (io) {
+
+        io.emit('reporte:estado_actualizado', {
+            tipo: 'infra:reporte:estado_actualizado',
+            payload: reporteActualizado,
+            timestamp: new Date().toISOString(),
+            version: '1.0'
+        });
+
+    }    
+
+    res.status(200).json({
+        ok: true,
+        mensaje: 'Estado actualizado correctamente',
+        data: reporteActualizado
     });
 
 };
@@ -480,5 +583,6 @@ module.exports = {
     crearReporte,
     actualizarReporte,
     eliminarReporte,
-    crearSeguimientoReporte
+    crearSeguimientoReporte,
+    actualizarEstadoReporte
 };

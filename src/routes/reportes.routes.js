@@ -8,7 +8,8 @@ const {
     crearReporte,
     actualizarReporte,
     eliminarReporte,
-    crearSeguimientoReporte
+    crearSeguimientoReporte,
+    actualizarEstadoReporte
 } = require('../controllers/reportes.controller');
 
 /**
@@ -93,6 +94,39 @@ router.post('/', crearReporte);
  *         description: Reporte no encontrado
  */
 router.post('/seguimiento/:id', crearSeguimientoReporte);
+
+/**
+ * @swagger
+ * /api/reportes/{id}/estado:
+ *   patch:
+ *     summary: Actualizar solo el estado de un reporte
+ *     tags:
+ *       - Reportes
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               estado:
+ *                 type: string
+ *                 example: Atendido
+ *     responses:
+ *       200:
+ *         description: Estado actualizado correctamente
+ *       400:
+ *         description: Error de validación
+ *       404:
+ *         description: Reporte no encontrado
+ */
+router.patch('/:id/estado', actualizarEstadoReporte);
 
 /**
  * @swagger
