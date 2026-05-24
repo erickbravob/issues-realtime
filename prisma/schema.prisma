@@ -37,10 +37,26 @@ model Reporte {
 
   usuario         Usuario     @relation(fields: [usuarioId], references: [id])
   categoria       Categoria   @relation(fields: [categoriaId], references: [id])
+  
+  seguimientos    SeguimientoReporte[]
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
   @@index([estado])
   @@index([categoriaId])
+}
+
+model SeguimientoReporte {
+  id          Int      @id @default(autoincrement())
+  detalle     String
+  responsable String
+  fecha       DateTime @default(now())
+
+  reporteId   Int
+  reporte     Reporte  @relation(fields: [reporteId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([reporteId])
 }

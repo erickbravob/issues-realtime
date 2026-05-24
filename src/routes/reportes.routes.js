@@ -7,7 +7,8 @@ const {
     obtenerReportePorId,
     crearReporte,
     actualizarReporte,
-    eliminarReporte
+    eliminarReporte,
+    crearSeguimientoReporte
 } = require('../controllers/reportes.controller');
 
 /**
@@ -22,27 +23,6 @@ const {
  *         description: Lista de reportes obtenida correctamente
  */
 router.get('/', listarReportes);
-
-/**
- * @swagger
- * /api/reportes/{id}:
- *   get:
- *     summary: Obtener un reporte por ID
- *     tags:
- *       - Reportes
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Reporte encontrado
- *       404:
- *         description: Reporte no encontrado
- */
-router.get('/:id', obtenerReportePorId);
 
 /**
  * @swagger
@@ -68,6 +48,10 @@ router.get('/:id', obtenerReportePorId);
  *                 type: string
  *               estado:
  *                 type: string
+ *               usuarioNombre:
+ *                 type: string
+ *               usuarioEmail:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Reporte creado correctamente
@@ -75,6 +59,61 @@ router.get('/:id', obtenerReportePorId);
  *         description: Error de validación
  */
 router.post('/', crearReporte);
+
+/**
+ * @swagger
+ * /api/reportes/seguimiento/{id}:
+ *   post:
+ *     summary: Registrar seguimiento de un reporte
+ *     tags:
+ *       - Seguimientos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               detalle:
+ *                 type: string
+ *               responsable:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Seguimiento creado correctamente
+ *       400:
+ *         description: Error de validación
+ *       404:
+ *         description: Reporte no encontrado
+ */
+router.post('/seguimiento/:id', crearSeguimientoReporte);
+
+/**
+ * @swagger
+ * /api/reportes/{id}:
+ *   get:
+ *     summary: Obtener un reporte por ID
+ *     tags:
+ *       - Reportes
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Reporte encontrado
+ *       404:
+ *         description: Reporte no encontrado
+ */
+router.get('/:id', obtenerReportePorId);
 
 /**
  * @swagger

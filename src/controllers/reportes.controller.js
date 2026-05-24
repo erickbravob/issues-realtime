@@ -387,10 +387,98 @@ const eliminarReporte = async (req, res) => {
 
 };
 
+const crearSeguimientoReporte = async (req, res) => {
+
+    const id = parseInt(req.params.id);
+
+    const {
+        detalle,
+        responsable
+    } = req.body;
+
+    if (!detalle || !responsable) {
+
+        return res.status(400).json({
+            ok: false,
+            mensaje: 'Los campos detalle y responsable son obligatorios'
+        });
+
+    }
+
+    const reporteExiste = await prisma.reporte.findUnique({
+        where: {
+            id
+        },
+        include: {
+            usuario: true,
+            categoria: true
+        }
+    });
+
+    if (!reporteExiste) {
+
+        return res.status(404).json({
+            ok: false,
+            mensaje: 'Reporte no encontrado'
+        });
+
+    }
+
+    const seguimiento = await prisma.seguimientoReporte.create({
+        data: {
+            detalle,
+            responsable,
+            reporteId: id
+        },
+        include: {
+            reporte: {
+                include: {
+                    usuario: true,
+                    categoria: true
+                }
+            }
+        }
+    });
+
+    await eliminarCachePorPatron('reportes:*');
+
+    await publicarEvento(
+        'infra:reportes',
+        'infra:reporte:seguimiento_creado',
+        seguimiento
+    );
+
+    await publicarEvento(
+        'infra:notificaciones',
+        'infra:notificacion:mantenimiento',
+        {
+            mensaje: 'Se registró un nuevo seguimiento del reporte',
+            seguimiento
+        }
+    );
+
+    const io = req.app.get('io');
+
+    io.emit('reporte:seguimiento_creado', {
+        tipo: 'infra:reporte:seguimiento_creado',
+        payload: seguimiento,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    });
+
+    res.status(201).json({
+        ok: true,
+        mensaje: 'Seguimiento registrado correctamente',
+        data: seguimiento
+    });
+
+};
+
 module.exports = {
     listarReportes,
     obtenerReportePorId,
     crearReporte,
     actualizarReporte,
-    eliminarReporte
+    eliminarReporte,
+    crearSeguimientoReporte
 };

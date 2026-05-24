@@ -346,9 +346,9 @@ Prisma simplifica el acceso a PostgreSQL mediante modelos tipados, migraciones a
 
 Socket.IO permite actualizar la interfaz web automáticamente sin necesidad de recargar el navegador.
 
-Autor
+Autor:
 
-Erick Bravo Borges
-Programación IV
-Universidad Privada Domingo Savio
-Gestión 2026
+Erick Bravo Borges,
+Programación IV,
+Universidad Privada Domingo Savio,
+Gestión 2026.
