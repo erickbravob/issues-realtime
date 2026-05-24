@@ -6,7 +6,14 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "subscriber": "node src/redis/redis.subscriber.js"
+    "subscriber": "node src/redis/redis.subscriber.js",
+    "test": "jest --detectOpenHandles --forceExit"
+  },
+
+  "jest": {
+    "testMatch": [
+      "**/pruebas/**/*.js"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -24,7 +31,9 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
+    "jest": "^30.4.2",
     "nodemon": "^3.1.14",
-    "prisma": "^6.19.3"
+    "prisma": "^6.19.3",
+    "supertest": "^7.2.2"
   }
 }

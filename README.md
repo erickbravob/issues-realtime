@@ -142,6 +142,8 @@ Funcionalidades implementadas
 ✅ Búsqueda, filtros y paginación
 ✅ Subscriber independiente Redis
 ✅ Eventos tipados JSON
+✅ Caché Redis para lecturas frecuentes
+✅ Invalidación automática de caché
 
 Endpoints principales
 Método	Ruta	Descripción
@@ -175,7 +177,7 @@ Paginación: GET /api/reportes?page=1&limit=10
 
 Estas funcionalidades permiten alcanzar el nivel estratégico definido en la rúbrica oficial mediante búsqueda, filtros y paginación implementados en la API.
 
-Redis Pub/Sub
+# Redis Pub/Sub
 
 El sistema utiliza Redis Pub/Sub mediante Upstash Redis para enviar eventos en tiempo real cuando se crean, actualizan o eliminan reportes.
 
@@ -199,6 +201,16 @@ Estructura JSON de eventos
 }
 
 La integración Redis + Base de Datos permite que cada operación realizada sobre PostgreSQL dispare automáticamente eventos Pub/Sub, cumpliendo la arquitectura distribuida requerida por la Actividad 3.
+
+Además del patrón Pub/Sub, Redis también fue utilizado como sistema de caché para optimizar consultas frecuentes del endpoint GET /api/reportes.
+
+La estrategia implementada consiste en:
+
+- Guardar respuestas GET frecuentes en Redis.
+- Reutilizar caché cuando la consulta ya existe.
+- Invalidar automáticamente la caché cuando ocurre POST, PUT o DELETE.
+
+Esto reduce consultas repetitivas a PostgreSQL y mejora el rendimiento general de la API.
 
 Socket.IO y tiempo real
 
