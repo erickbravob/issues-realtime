@@ -1,62 +1,103 @@
-const { reportes } = require('../data/reportes.data');
+const prisma = require('../config/prisma.client');
 const { publicarEvento } = require('../redis/redis.publisher');
 
-const listarReportes = (req, res) => {
+const listarReportes = async (req, res) => {
 
     const { q, estado, categoria, page = 1, limit = 10 } = req.query;
 
-    let resultado = [...reportes];
+    const pagina = parseInt(page);
+    const limite = parseInt(limit);
+    const salto = (pagina - 1) * limite;
+
+    const filtros = {};
 
     if (q) {
-        const textoBusqueda = q.toLowerCase();
-
-        resultado = resultado.filter(reporte =>
-            reporte.titulo.toLowerCase().includes(textoBusqueda) ||
-            reporte.descripcion.toLowerCase().includes(textoBusqueda) ||
-            reporte.ubicacion.toLowerCase().includes(textoBusqueda)
-        );
+        filtros.OR = [
+            {
+                titulo: {
+                    contains: q,
+                    mode: 'insensitive'
+                }
+            },
+            {
+                descripcion: {
+                    contains: q,
+                    mode: 'insensitive'
+                }
+            },
+            {
+                ubicacion: {
+                    contains: q,
+                    mode: 'insensitive'
+                }
+            }
+        ];
     }
 
     if (estado) {
-        resultado = resultado.filter(reporte =>
-            reporte.estado.toLowerCase() === estado.toLowerCase()
-        );
+        filtros.estado = {
+            equals: estado,
+            mode: 'insensitive'
+        };
     }
 
     if (categoria) {
-        resultado = resultado.filter(reporte =>
-            reporte.categoria.toLowerCase() === categoria.toLowerCase()
-        );
+        filtros.categoria = {
+            nombre: {
+                equals: categoria,
+                mode: 'insensitive'
+            }
+        };
     }
 
-    const pagina = parseInt(page);
-    const limite = parseInt(limit);
-    const inicio = (pagina - 1) * limite;
-    const fin = inicio + limite;
+    const total = await prisma.reporte.count({
+        where: filtros
+    });
 
-    const datosPaginados = resultado.slice(inicio, fin);
+    const reportes = await prisma.reporte.findMany({
+        where: filtros,
+        include: {
+            usuario: true,
+            categoria: true
+        },
+        skip: salto,
+        take: limite,
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
 
     res.status(200).json({
         ok: true,
-        total: resultado.length,
+        total,
         pagina,
         limite,
-        data: datosPaginados
+        data: reportes
     });
 
 };
 
-const obtenerReportePorId = (req, res) => {
+const obtenerReportePorId = async (req, res) => {
 
     const id = parseInt(req.params.id);
 
-    const reporte = reportes.find(r => r.id === id);
+    const reporte = await prisma.reporte.findUnique({
+        where: {
+            id
+        },
+        include: {
+            usuario: true,
+            categoria: true
+        }
+    });
 
     if (!reporte) {
+
         return res.status(404).json({
             ok: false,
             mensaje: 'Reporte no encontrado'
         });
+
     }
 
     res.status(200).json({
@@ -73,10 +114,12 @@ const crearReporte = async (req, res) => {
         descripcion,
         ubicacion,
         categoria,
-        estado
+        estado,
+        usuarioNombre,
+        usuarioEmail
     } = req.body;
 
-    if (!titulo || !descripcion || !ubicacion || !categoria || !estado) {
+    if (!titulo || !descripcion || !ubicacion || !categoria || !estado || !usuarioNombre || !usuarioEmail) {
 
         return res.status(400).json({
             ok: false,
@@ -85,16 +128,43 @@ const crearReporte = async (req, res) => {
 
     }
 
-    const nuevoReporte = {
-        id: reportes.length + 1,
-        titulo,
-        descripcion,
-        ubicacion,
-        categoria,
-        estado
-    };
+    const usuario = await prisma.usuario.upsert({
+        where: {
+            email: usuarioEmail
+        },
+        update: {
+            nombre: usuarioNombre
+        },
+        create: {
+            nombre: usuarioNombre,
+            email: usuarioEmail
+        }
+    });
 
-    reportes.push(nuevoReporte);
+    const categoriaRegistro = await prisma.categoria.upsert({
+        where: {
+            nombre: categoria
+        },
+        update: {},
+        create: {
+            nombre: categoria
+        }
+    });
+
+    const nuevoReporte = await prisma.reporte.create({
+        data: {
+            titulo,
+            descripcion,
+            ubicacion,
+            estado,
+            usuarioId: usuario.id,
+            categoriaId: categoriaRegistro.id
+        },
+        include: {
+            usuario: true,
+            categoria: true
+        }
+    });
 
     await publicarEvento(
         'infra:reportes',
@@ -132,17 +202,6 @@ const actualizarReporte = async (req, res) => {
 
     const id = parseInt(req.params.id);
 
-    const reporte = reportes.find(r => r.id === id);
-
-    if (!reporte) {
-
-        return res.status(404).json({
-            ok: false,
-            mensaje: 'Reporte no encontrado'
-        });
-
-    }
-
     const {
         titulo,
         descripcion,
@@ -160,11 +219,47 @@ const actualizarReporte = async (req, res) => {
 
     }
 
-    reporte.titulo = titulo;
-    reporte.descripcion = descripcion;
-    reporte.ubicacion = ubicacion;
-    reporte.categoria = categoria;
-    reporte.estado = estado;
+    const reporteExiste = await prisma.reporte.findUnique({
+        where: {
+            id
+        }
+    });
+
+    if (!reporteExiste) {
+
+        return res.status(404).json({
+            ok: false,
+            mensaje: 'Reporte no encontrado'
+        });
+
+    }
+
+    const categoriaRegistro = await prisma.categoria.upsert({
+        where: {
+            nombre: categoria
+        },
+        update: {},
+        create: {
+            nombre: categoria
+        }
+    });
+
+    const reporte = await prisma.reporte.update({
+        where: {
+            id
+        },
+        data: {
+            titulo,
+            descripcion,
+            ubicacion,
+            estado,
+            categoriaId: categoriaRegistro.id
+        },
+        include: {
+            usuario: true,
+            categoria: true
+        }
+    });
 
     await publicarEvento(
         'infra:reportes',
@@ -202,9 +297,17 @@ const eliminarReporte = async (req, res) => {
 
     const id = parseInt(req.params.id);
 
-    const indice = reportes.findIndex(r => r.id === id);
+    const reporteExiste = await prisma.reporte.findUnique({
+        where: {
+            id
+        },
+        include: {
+            usuario: true,
+            categoria: true
+        }
+    });
 
-    if (indice === -1) {
+    if (!reporteExiste) {
 
         return res.status(404).json({
             ok: false,
@@ -213,14 +316,16 @@ const eliminarReporte = async (req, res) => {
 
     }
 
-    const reporteEliminado = reportes[indice];
-
-    reportes.splice(indice, 1);
+    const reporteEliminado = await prisma.reporte.delete({
+        where: {
+            id
+        }
+    });
 
     await publicarEvento(
         'infra:reportes',
         'infra:reporte:eliminado',
-        reporteEliminado
+        reporteExiste
     );
 
     await publicarEvento(
@@ -228,7 +333,7 @@ const eliminarReporte = async (req, res) => {
         'infra:notificacion:mantenimiento',
         {
             mensaje: 'Reporte de infraestructura eliminado',
-            reporte: reporteEliminado
+            reporte: reporteExiste
         }
     );
 
@@ -236,7 +341,7 @@ const eliminarReporte = async (req, res) => {
 
     io.emit('reporte:eliminado', {
         tipo: 'infra:reporte:eliminado',
-        payload: reporteEliminado,
+        payload: reporteExiste,
         timestamp: new Date().toISOString(),
         version: '1.0'
     });
