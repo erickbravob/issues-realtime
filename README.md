@@ -39,7 +39,6 @@ Además, el sistema implementa comunicación en tiempo real utilizando Redis Pub
 
 # Arquitectura del sistema
 
-```text
 Cliente Web / Swagger
         ↓
 API REST Express
@@ -144,6 +143,7 @@ Funcionalidades implementadas
 ✅ Eventos tipados JSON
 ✅ Caché Redis para lecturas frecuentes
 ✅ Invalidación automática de caché
+✅ Pruebas automatizadas con Jest y Supertest
 
 Endpoints principales
 Método	Ruta	Descripción
@@ -231,11 +231,11 @@ Archivo .env:
 
 PORT=3000
 
-REDIS_URL=redis://default:"Pass"@TU_HOST_REDIS:6379
+REDIS_URL=redis://default:"Pass"@"Host"_REDIS:6379
 
-DATABASE_URL=postgresql://postgres:"Pass"@TU_HOST_SUPABASE:6543/postgres?pgbouncer=true
+DATABASE_URL=postgresql://postgres:"Pass"@"Host"_SUPABASE:6543/postgres?pgbouncer=true
 
-DIRECT_URL=postgresql://postgres:"Pass"@TU_HOST_SUPABASE:5432/postgres
+DIRECT_URL=postgresql://postgres:"Pass"@"Host"_SUPABASE:5432/postgres
 
 Las variables de entorno permiten separar credenciales sensibles del código fuente principal siguiendo las recomendaciones de la guía y las buenas prácticas de despliegue cloud.
 
@@ -254,7 +254,8 @@ Scripts disponibles
 {
   "start": "node src/server.js",
   "dev": "nodemon src/server.js",
-  "subscriber": "node src/redis/redis.subscriber.js"
+  "subscriber": "node src/redis/redis.subscriber.js",
+  "test": "jest --detectOpenHandles --forceExit"
 }
 Producción
 API
@@ -291,6 +292,28 @@ Validaciones implementadas
 ✅ Eventos Redis estructurados
 ✅ Persistencia real en Supabase
 ✅ Comunicación realtime Socket.IO
+
+# Pruebas automatizadas
+
+El sistema implementa pruebas básicas de integración utilizando Jest y Supertest.
+
+Endpoints probados:
+
+- GET /api/health
+- GET /api/info
+- GET /api/reportes
+
+Ejecución de pruebas:
+
+npm test
+
+Resultado esperado:
+
+PASS pruebas/api.prueba.js
+3 passed
+0 failed
+
+Las pruebas automatizadas permiten validar el funcionamiento básico de la API y garantizan estabilidad en los endpoints principales.
 
 Commits semánticos implementados
 
