@@ -1,4 +1,4 @@
-API REST — Sistema de Reportes de Infraestructura Universitaria
+API REST — Issues Realtime
 
 Proyecto desarrollado para la materia Programación IV de la Universidad Privada Domingo Savio (UPDS).
 
@@ -50,7 +50,7 @@ Navegador en tiempo real
 La arquitectura implementada sigue el enfoque distribuido propuesto por el texto guía de Programación IV, integrando API REST, Redis Pub/Sub y base de datos cloud dentro de una misma solución cohesiva.
 
 Estructura del proyecto
-ACTIVIDAD_1/
+ISSUES_REALTIME/
 │
 ├── prisma/
 │   ├── migrations/
