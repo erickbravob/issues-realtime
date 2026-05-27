@@ -281,11 +281,11 @@ Scripts disponibles
 }
 Producción
 API
-https://actividad-1-api-reportes.onrender.com
+https://issues-realtime-api-reportes.onrender.com
 Swagger
-https://actividad-1-api-reportes.onrender.com/api-docs
+https://issues-realtime.onrender.com/api/reportes
 Panel tiempo real
-https://actividad-1-api-reportes.onrender.com
+https://issues-realtime.onrender.com
 
 La API fue desplegada en Render configurando variables de entorno y verificando funcionamiento completo de los endpoints en producción.
 
