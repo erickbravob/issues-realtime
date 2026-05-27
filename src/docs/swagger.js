@@ -14,7 +14,7 @@ const opcionesSwagger = {
                 description: 'Servidor local'
             },
             {
-                url: 'https://actividad-1-api-reportes.onrender.com',
+                url: 'https://issues-realtime.onrender.com',
                 description: 'Servidor en producción'
             }
         ]
