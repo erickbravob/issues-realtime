@@ -8,6 +8,23 @@ const opcionesSwagger = {
             version: '1.0.0',
             description: 'Documentación Swagger para la API de reportes universitarios'
         },
+
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                }
+            }
+        },
+        
+        security: [
+            {
+                BearerAuth: []
+            }
+        ],
+
         servers: [
             {
                 url: 'http://localhost:3000',
