@@ -4,7 +4,8 @@ const router = express.Router();
 
 const {
     registrarUsuario,
-    loginUsuario
+    loginUsuario,
+    renovarToken
 } = require('../controllers/auth.controller');
 
 /**
@@ -76,5 +77,34 @@ router.post('/register', registrarUsuario);
  *         description: Credenciales incorrectas
  */
 router.post('/login', loginUsuario);
+
+/**
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     summary: Renovar token JWT usando refresh token
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: 4ad8bd9c785fab57b5b7a9cba309b9c33282894c263b2fe66ff1b38c91c366952b00d21f47afad904d59a149f98e80a9abe17e60273007bfdabffbcf88f4ab08
+ *     responses:
+ *       200:
+ *         description: Token renovado correctamente
+ *       400:
+ *         description: Refresh token requerido
+ *       401:
+ *         description: Refresh token inválido o expirado
+ */
+router.post('/refresh', renovarToken);
 
 module.exports = router;

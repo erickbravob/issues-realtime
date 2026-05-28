@@ -213,7 +213,71 @@ const loginUsuario = async (req, res) => {
 
 };
 
+const renovarToken = async (req, res) => {
+
+    try {
+
+        const { refreshToken } = req.body;
+
+        if (!refreshToken) {
+
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Refresh token requerido'
+            });
+
+        }
+
+        const tokenGuardado = await prisma.refreshToken.findUnique({
+            where: {
+                token: refreshToken
+            },
+            include: {
+                usuario: true
+            }
+        });
+
+        if (!tokenGuardado) {
+
+            return res.status(401).json({
+                ok: false,
+                mensaje: 'Refresh token inválido'
+            });
+
+        }
+
+        if (tokenGuardado.expiresAt < new Date()) {
+
+            return res.status(401).json({
+                ok: false,
+                mensaje: 'Refresh token expirado'
+            });
+
+        }
+
+        const nuevoAccessToken = generarAccessToken(tokenGuardado.usuario);
+
+        res.status(200).json({
+            ok: true,
+            mensaje: 'Token renovado correctamente',
+            token: nuevoAccessToken,
+            tipo: 'Bearer',
+            expiraEn: process.env.JWT_EXPIRES_IN || '1h'
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            ok: false,
+            mensaje: 'Error interno al renovar token'
+        });
+
+    }
+
+};
+
 module.exports = {
     registrarUsuario,
-    loginUsuario
+    loginUsuario,
+    renovarToken
 };
