@@ -5,8 +5,11 @@ const router = express.Router();
 const {
     registrarUsuario,
     loginUsuario,
-    renovarToken
+    renovarToken,
+    cerrarSesion
 } = require('../controllers/auth.controller');
+
+const autenticar = require('../middlewares/autenticar');
 
 /**
  * @swagger
@@ -106,5 +109,22 @@ router.post('/login', loginUsuario);
  *         description: Refresh token inválido o expirado
  */
 router.post('/refresh', renovarToken);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Cerrar sesión y revocar token JWT
+ *     tags:
+ *       - Autenticación
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada correctamente
+ *       401:
+ *         description: Token inválido, expirado o no enviado
+ */
+router.post('/logout', autenticar, cerrarSesion);
 
 module.exports = router;

@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken');
 
-const autenticar = (req, res, next) => {
+const {
+    verificarTokenBlacklist
+} = require('../redis/redis.client');
+
+const autenticar = async (req, res, next) => {
+
+    console.log('MIDDLEWARE JWT EJECUTADO');
 
     const authHeader = req.headers.authorization;
 
@@ -17,9 +23,21 @@ const autenticar = (req, res, next) => {
 
     try {
 
+        const tokenRevocado = await verificarTokenBlacklist(token);
+
+        if (tokenRevocado) {
+
+            return res.status(401).json({
+                ok: false,
+                mensaje: 'Token revocado. Inicie sesión nuevamente'
+            });
+
+        }
+
         const payload = jwt.verify(token, process.env.JWT_SECRET);
 
         req.usuario = payload;
+        req.token = token;
 
         next();
 

@@ -31,6 +31,45 @@ redis.on('error', (error) => {
 
 });
 
+const agregarTokenBlacklist = async (token, expiracionSegundos) => {
+
+    try {
+
+        await redis.set(
+            `blacklist:token:${token}`,
+            'revocado',
+            'EX',
+            expiracionSegundos
+        );
+
+        console.log('Token agregado a blacklist Redis');
+
+    } catch (error) {
+
+        console.error('Error agregando token a blacklist:', error.message);
+
+    }
+
+};
+
+const verificarTokenBlacklist = async (token) => {
+
+    try {
+
+        const existe = await redis.get(`blacklist:token:${token}`);
+
+        return existe !== null;
+
+    } catch (error) {
+
+        console.error('Error verificando blacklist:', error.message);
+
+        return false;
+
+    }
+
+};
+
 const validarConexionRedis = async () => {
 
     try {
@@ -143,5 +182,7 @@ module.exports = {
     guardarCache,
     obtenerCache,
     eliminarCache,
-    eliminarCachePorPatron
+    eliminarCachePorPatron,
+    agregarTokenBlacklist,
+    verificarTokenBlacklist
 };

@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const prisma = require('../config/prisma.client');
+const {
+    agregarTokenBlacklist
+} = require('../redis/redis.client');
 
 const generarAccessToken = (usuario) => {
 
@@ -276,8 +279,50 @@ const renovarToken = async (req, res) => {
 
 };
 
+const cerrarSesion = async (req, res) => {
+
+    try {
+
+        const token = req.token;
+
+        const decoded = jwt.decode(token);
+
+        if (!decoded || !decoded.exp) {
+
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Token inválido para cerrar sesión'
+            });
+
+        }
+
+        const segundosRestantes = decoded.exp - Math.floor(Date.now() / 1000);
+
+        if (segundosRestantes > 0) {
+
+            await agregarTokenBlacklist(token, segundosRestantes);
+
+        }
+
+        res.status(200).json({
+            ok: true,
+            mensaje: 'Sesión cerrada correctamente. Token revocado en Redis'
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            ok: false,
+            mensaje: 'Error interno al cerrar sesión'
+        });
+
+    }
+
+};
+
 module.exports = {
     registrarUsuario,
     loginUsuario,
-    renovarToken
+    renovarToken,
+    cerrarSesion
 };
