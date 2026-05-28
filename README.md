@@ -1,55 +1,113 @@
-API REST — Issues Realtime
+# API REST — Issues Realtime v4.4.0
 
-Proyecto desarrollado para la materia Programación IV de la Universidad Privada Domingo Savio (UPDS).
+## Programación IV – Universidad Privada Domingo Savio (UPDS)
 
-El sistema implementa una arquitectura distribuida basada en API REST, PostgreSQL cloud, Redis Pub/Sub, caché distribuido y notificaciones en tiempo real mediante Socket.IO, tomando como referencia la arquitectura propuesta en el texto guía de StudySync adaptada al proyecto final de infraestructura universitaria.
+**Autor:** Erick Bravo Borges
+**Gestión:** 2026
+**Materia:** Programación IV
+**Proyecto Final:** Sistema Distribuido de Reportes de Infraestructura Universitaria
 
-Descripción
+---
 
-El sistema permite registrar, consultar, actualizar y eliminar reportes relacionados con problemas de infraestructura universitaria, tales como:
+# Descripción General
 
-luminarias dañadas,
-fugas de agua,
-cableado defectuoso,
-problemas eléctricos,
-daños en aulas,
-mantenimiento institucional.
+Issues Realtime es una plataforma backend distribuida desarrollada progresivamente durante las actividades académicas de la materia Programación IV.
 
-Además, el sistema implementa comunicación en tiempo real utilizando Redis Pub/Sub y Socket.IO, permitiendo que los eventos generados por la API sean enviados automáticamente a clientes conectados desde navegador.
+El sistema permite registrar, consultar, actualizar, monitorear y dar seguimiento a problemas de infraestructura universitaria mediante una arquitectura moderna basada en API REST, PostgreSQL Cloud, Redis, Socket.IO y mecanismos avanzados de seguridad.
 
-El proyecto fue evolucionando incrementalmente por actividades académicas hasta convertirse en la base arquitectónica del proyecto final de Programación IV.
+La aplicación fue evolucionando actividad tras actividad hasta convertirse en una solución backend profesional que incorpora:
 
-Tecnologías utilizadas
-Tecnología	Uso en el sistema
-Node.js + Express	API REST y servidor backend
-Prisma ORM	Acceso y modelado de base de datos
-Supabase PostgreSQL	Persistencia cloud de datos
-Upstash Redis	Redis Pub/Sub y caché
-Socket.IO	Comunicación en tiempo real
-Swagger/OpenAPI	Documentación interactiva
-Jest + Supertest	Pruebas automatizadas
-dotenv	Variables de entorno
-Git y GitHub	Control de versiones
-Render	Despliegue cloud
-Docker (planificado)	Contenerización futura
-Arquitectura del sistema
-Cliente Web / Swagger
-        ↓
+* Persistencia cloud.
+* Comunicación distribuida.
+* Notificaciones en tiempo real.
+* Cache distribuido.
+* Documentación interactiva.
+* Pruebas automatizadas.
+* Seguridad JWT.
+* Protección de endpoints.
+* Control de sesiones.
+* Arquitectura escalable.
+
+---
+
+# Objetivo del Proyecto
+
+Digitalizar el proceso de reporte y seguimiento de incidencias de infraestructura universitaria, permitiendo gestionar eventos como:
+
+* Luminarias dañadas.
+* Fugas de agua.
+* Problemas eléctricos.
+* Daños en aulas.
+* Cableado defectuoso.
+* Equipos averiados.
+* Problemas de mantenimiento institucional.
+
+---
+
+# Tecnologías Utilizadas
+
+| Tecnología            | Uso                     |
+| --------------------- | ----------------------- |
+| Node.js               | Entorno de ejecución    |
+| Express.js            | API REST                |
+| Prisma ORM            | Acceso a datos          |
+| PostgreSQL (Supabase) | Persistencia cloud      |
+| Redis (Upstash)       | Cache y Pub/Sub         |
+| Socket.IO             | Tiempo real             |
+| Swagger/OpenAPI       | Documentación           |
+| JWT                   | Autenticación           |
+| bcryptjs              | Cifrado de contraseñas  |
+| Helmet                | Seguridad HTTP          |
+| Express Rate Limit    | Protección contra abuso |
+| Jest                  | Pruebas automatizadas   |
+| Supertest             | Testing API             |
+| dotenv                | Variables de entorno    |
+| Git/GitHub            | Versionamiento          |
+| Render                | Despliegue cloud        |
+
+---
+
+# Arquitectura General
+
+```text
+Cliente Web
+      │
+      ▼
+Swagger / Navegador
+      │
+      ▼
 API REST Express
-        ↓
-Supabase PostgreSQL
-        ↓
-Redis Pub/Sub
-        ↓
+      │
+      ├──────────────► JWT Authentication
+      │
+      ├──────────────► Redis Cache
+      │
+      ├──────────────► Redis Pub/Sub
+      │
+      ▼
+Prisma ORM
+      │
+      ▼
+PostgreSQL Cloud
+      │
+      ▼
+Eventos Redis
+      │
+      ▼
 Subscriber Redis
-        ↓
+      │
+      ▼
 Socket.IO
-        ↓
-Navegador en tiempo real
+      │
+      ▼
+Notificaciones en Tiempo Real
+```
 
-La arquitectura implementada sigue el enfoque distribuido propuesto por el texto guía de Programación IV, integrando API REST, Redis Pub/Sub y base de datos cloud dentro de una misma solución cohesiva.
+---
 
-Estructura del proyecto
+# Estructura Actual del Proyecto
+
+```text
 ISSUES_REALTIME/
 │
 ├── prisma/
@@ -63,14 +121,20 @@ ISSUES_REALTIME/
 │   └── index.html
 │
 ├── src/
+│
 │   ├── config/
 │   │   └── prisma.client.js
 │   │
 │   ├── controllers/
+│   │   ├── auth.controller.js
 │   │   └── reportes.controller.js
 │   │
 │   ├── docs/
 │   │   └── swagger.js
+│   │
+│   ├── middlewares/
+│   │   ├── autenticar.js
+│   │   └── rateLimit.js
 │   │
 │   ├── redis/
 │   │   ├── redis.client.js
@@ -78,6 +142,7 @@ ISSUES_REALTIME/
 │   │   └── redis.subscriber.js
 │   │
 │   ├── routes/
+│   │   ├── auth.routes.js
 │   │   └── reportes.routes.js
 │   │
 │   ├── app.js
@@ -87,379 +152,655 @@ ISSUES_REALTIME/
 ├── .gitignore
 ├── package.json
 └── README.md
-Modelo de datos
-Usuario
+```
 
-Representa a la persona que registra un reporte.
+---
 
-Campos principales:
+# Modelo de Datos
 
-id
-nombre
-email
-createdAt
-Categoria
+## Usuario
 
-Representa la clasificación del reporte.
+Representa la persona que utiliza el sistema.
 
-Campos principales:
+Campos:
 
-id
-nombre
-createdAt
-Reporte
+* id
+* nombre
+* email
+* password
+* createdAt
 
-Representa el problema de infraestructura reportado.
+---
 
-Campos principales:
+## Categoria
 
-id
-titulo
-descripcion
-ubicacion
-estado
-usuarioId
-categoriaId
-createdAt
-updatedAt
-SeguimientoReporte
+Clasificación de reportes.
 
-Representa el historial y seguimiento de atención de un reporte.
+Campos:
 
-Campos principales:
+* id
+* nombre
+* createdAt
 
-id
-detalle
-responsable
-fecha
-reporteId
-createdAt
-Funcionalidades implementadas
+---
 
-✅ CRUD completo de reportes
-✅ Persistencia real en PostgreSQL cloud
-✅ Redis Pub/Sub funcional
-✅ Eventos en tiempo real con Socket.IO
-✅ Swagger/OpenAPI
-✅ Arquitectura MVC
-✅ Relaciones entre tablas
-✅ Migraciones Prisma
+## Reporte
+
+Representa una incidencia de infraestructura.
+
+Campos:
+
+* id
+* titulo
+* descripcion
+* ubicacion
+* estado
+* usuarioId
+* categoriaId
+* createdAt
+* updatedAt
+
+---
+
+## SeguimientoReporte
+
+Historial de atención.
+
+Campos:
+
+* id
+* detalle
+* responsable
+* fecha
+* reporteId
+* createdAt
+
+---
+
+## RefreshToken
+
+Control de renovación de sesiones.
+
+Campos:
+
+* id
+* token
+* usuarioId
+* expiresAt
+* createdAt
+
+---
+
+# Funcionalidades Implementadas
+
+## Gestión de Reportes
+
+✅ CRUD completo
+
+✅ Búsqueda
+
+✅ Filtros
+
+✅ Paginación
+
+✅ Seguimiento
+
+✅ Cambio de estado
+
+---
+
+## Persistencia
+
+✅ PostgreSQL Cloud
+
+✅ Prisma ORM
+
+✅ Migraciones
+
+✅ Relaciones entre entidades
+
+---
+
+## Redis
+
+✅ Cache distribuido
+
+✅ Invalidación automática
+
+✅ Pub/Sub
+
+✅ Eventos estructurados
+
+---
+
+## Tiempo Real
+
+✅ Socket.IO
+
+✅ Eventos en navegador
+
+✅ Seguimientos en tiempo real
+
+✅ Cambio de estado en tiempo real
+
+---
+
+## Seguridad
+
+✅ JWT Authentication
+
+✅ Refresh Tokens
+
+✅ Logout Seguro
+
+✅ Blacklist Redis
+
+✅ Middleware JWT
+
+✅ Swagger Authorize
+
+✅ Helmet
+
+✅ Rate Limiting
+
+---
+
+## Calidad
+
+✅ Swagger
+
+✅ Jest
+
+✅ Supertest
+
 ✅ Variables de entorno
-✅ Producción en Render
-✅ Búsqueda, filtros y paginación
-✅ Subscriber independiente Redis
-✅ Eventos tipados JSON
-✅ Caché Redis para lecturas frecuentes
-✅ Invalidación automática de caché
-✅ Seguimiento de reportes en tiempo real
-✅ Cambio de estado independiente mediante PATCH
-✅ Eventos Socket.IO para seguimiento y actualización de estado
-✅ Pruebas automatizadas para endpoints críticos
-✅ Pruebas automatizadas con Jest y Supertest
 
-Endpoints principales
-Método	Ruta	Descripción
-GET	/api/reportes	Listar reportes
-GET	/api/reportes/:id	Obtener reporte por ID
-POST	/api/reportes	Crear reporte
-PUT	/api/reportes/:id	Actualizar reporte
-PATCH	/api/reportes/:id/estado	Actualizar estado del reporte
-DELETE	/api/reportes/:id	Eliminar reporte
-POST	/api/reportes/seguimiento/:id	Registrar seguimiento
-GET	/api/health	Estado de la API
-GET	/api/info	Información del sistema
-GET	/api-docs	Swagger/OpenAPI
-Ejemplo POST /api/reportes
-{
-  "titulo": "Fuga de agua en baño",
-  "descripcion": "Se detectó una fuga de agua en el lavamanos del baño de estudiantes.",
-  "ubicacion": "Bloque A - Planta baja",
-  "categoria": "Servicios básicos",
-  "estado": "Pendiente",
-  "usuarioNombre": "Erick Bravo",
-  "usuarioEmail": "erick@upds.edu.bo"
-}
-Ejemplo PATCH /api/reportes/:id/estado
-{
-  "estado": "Atendido"
-}
-Ejemplo POST /api/reportes/seguimiento/:id
-{
-  "detalle": "Personal de mantenimiento verificó el aula y programó la reparación.",
-  "responsable": "Unidad de Mantenimiento"
-}
-Búsquedas y filtros
-GET /api/reportes?q=agua
-GET /api/reportes?estado=Pendiente
-GET /api/reportes?categoria=Servicios básicos
-GET /api/reportes?page=1&limit=10
+✅ Arquitectura MVC
 
-Estas funcionalidades permiten alcanzar el nivel estratégico definido en la rúbrica oficial mediante búsqueda, filtros y paginación implementados en la API.
+---
 
-Redis Pub/Sub
+# Endpoints Principales
 
-El sistema utiliza Redis Pub/Sub mediante Upstash Redis para enviar eventos en tiempo real cuando se crean, actualizan o eliminan reportes.
+## Autenticación
 
-Canales implementados
+| Método | Ruta           | Descripción       |
+| ------ | -------------- | ----------------- |
+| POST   | /auth/register | Registrar usuario |
+| POST   | /auth/login    | Iniciar sesión    |
+| POST   | /auth/refresh  | Renovar JWT       |
+| POST   | /auth/logout   | Cerrar sesión     |
+
+---
+
+## Reportes
+
+| Método | Ruta                     |
+| ------ | ------------------------ |
+| GET    | /api/reportes            |
+| GET    | /api/reportes/:id        |
+| POST   | /api/reportes            |
+| PUT    | /api/reportes/:id        |
+| PATCH  | /api/reportes/:id/estado |
+| DELETE | /api/reportes/:id        |
+
+---
+
+## Seguimientos
+
+| Método | Ruta                          |
+| ------ | ----------------------------- |
+| POST   | /api/reportes/seguimiento/:id |
+
+---
+
+## Utilitarios
+
+| Método | Ruta        |
+| ------ | ----------- |
+| GET    | /api/health |
+| GET    | /api/info   |
+| GET    | /api-docs   |
+
+---
+
+# Seguridad Implementada
+
+## JWT Authentication
+
+El sistema utiliza Access Tokens para autenticación.
+
+Proceso:
+
+```text
+Login
+  ↓
+JWT
+  ↓
+Acceso a rutas protegidas
+```
+
+---
+
+## Refresh Token
+
+Permite renovar sesiones sin volver a solicitar credenciales.
+
+```text
+JWT expira
+     ↓
+Refresh Token
+     ↓
+Nuevo JWT
+```
+
+---
+
+## Logout Seguro
+
+Cuando un usuario cierra sesión:
+
+```text
+Token JWT
+      ↓
+Redis Blacklist
+      ↓
+Token inválido inmediatamente
+```
+
+---
+
+## Helmet
+
+Protección mediante:
+
+* Content-Security-Policy
+* X-Frame-Options
+* X-Content-Type-Options
+* Strict-Transport-Security
+* Cross-Origin-Policies
+
+---
+
+## Rate Limiting
+
+Configuración:
+
+```text
+100 solicitudes
+cada 15 minutos
+por IP
+```
+
+---
+
+# Redis Pub/Sub
+
+Canales:
+
+```text
 infra:reportes
 infra:notificaciones
-Eventos implementados
+```
+
+Eventos:
+
+```text
 infra:reporte:creado
 infra:reporte:actualizado
 infra:reporte:eliminado
 infra:reporte:seguimiento_creado
 infra:reporte:estado_actualizado
 infra:notificacion:mantenimiento
-Estructura JSON de eventos
-{
-  "tipo": "infra:reporte:creado",
-  "payload": {
-    "id": 1,
-    "titulo": "Fuga de agua en baño"
-  },
-  "timestamp": "2026-05-22T13:03:40.422Z",
-  "version": "1.0"
-}
+```
 
-La integración Redis + Base de Datos permite que cada operación realizada sobre PostgreSQL dispare automáticamente eventos Pub/Sub, cumpliendo la arquitectura distribuida requerida por la Actividad 3.
+---
 
-Redis Cache
+# Redis Cache
 
-Además del patrón Pub/Sub, Redis también fue utilizado como sistema de caché para optimizar consultas frecuentes del endpoint:
+Endpoint optimizado:
 
+```text
 GET /api/reportes
-Estrategia implementada
-Guardar respuestas GET frecuentes en Redis.
-Reutilizar caché cuando la consulta ya existe.
-Invalidar automáticamente la caché cuando ocurre POST, PUT, PATCH o DELETE.
+```
 
-Esto reduce consultas repetitivas a PostgreSQL y mejora el rendimiento general de la API.
+Estrategia:
 
-Socket.IO y tiempo real
+* Cachear consultas frecuentes.
+* Reutilizar respuestas.
+* Invalidar automáticamente ante cambios.
 
-Socket.IO fue integrado para mostrar eventos en tiempo real en navegador.
+---
 
-Eventos emitidos
+# Socket.IO
+
+Eventos emitidos:
+
+```text
 reporte:creado
 reporte:actualizado
 reporte:eliminado
 reporte:seguimiento_creado
 reporte:estado_actualizado
-Panel tiempo real
+```
+
+Panel tiempo real:
+
+```text
 GET /
-Variables de entorno
+```
 
-Archivo .env
+---
 
+# Variables de Entorno
+
+```env
 PORT=3000
 
-REDIS_URL=redis://default:"PASSWORD"@"HOST_REDIS":6379
+DATABASE_URL=
 
-DATABASE_URL=postgresql://postgres:"PASSWORD"@"HOST_SUPABASE":6543/postgres?pgbouncer=true
+DIRECT_URL=
 
-DIRECT_URL=postgresql://postgres:"PASSWORD"@"HOST_SUPABASE":5432/postgres
+REDIS_URL=
 
-Las variables de entorno permiten separar credenciales sensibles del código fuente principal siguiendo las recomendaciones de despliegue cloud.
+JWT_SECRET=
 
-Instalación local
-Instalar dependencias
+JWT_EXPIRES_IN=1h
+
+JWT_REFRESH_EXPIRES_IN=7d
+```
+
+---
+
+# Instalación Local
+
+## Dependencias
+
+```bash
 npm install
-Generar Prisma Client
+```
+
+## Prisma
+
+```bash
 npx prisma generate
-Ejecutar migraciones
+```
+
+```bash
 npx prisma migrate dev
-Ejecutar servidor
+```
+
+## Ejecutar API
+
+```bash
 npm start
-Ejecutar subscriber Redis
+```
+
+## Ejecutar Subscriber
+
+```bash
 npm run subscriber
-Scripts disponibles
+```
+
+## Pruebas
+
+```bash
+npm test
+```
+
+---
+
+# Scripts
+
+```json
 {
   "start": "node src/server.js",
   "dev": "nodemon src/server.js",
   "subscriber": "node src/redis/redis.subscriber.js",
   "test": "jest --detectOpenHandles --forceExit"
 }
-Producción
-API
-https://issues-realtime-api-reportes.onrender.com
-Swagger
-https://issues-realtime.onrender.com/api/reportes
-Panel tiempo real
+```
+
+---
+
+# Producción
+
+## API
+
+```text
 https://issues-realtime.onrender.com
+```
 
-La API fue desplegada en Render configurando variables de entorno y verificando funcionamiento completo de los endpoints en producción.
+## Swagger
 
-Persistencia cloud
+```text
+https://issues-realtime.onrender.com/api-docs
+```
 
-Inicialmente el sistema utilizaba almacenamiento temporal en memoria mediante arreglos JavaScript.
+## Health Check
 
-Posteriormente, durante la Actividad 3, la arquitectura evolucionó hacia persistencia real utilizando Supabase PostgreSQL y Prisma ORM.
+```text
+https://issues-realtime.onrender.com/api/health
+```
 
-Actualmente:
+---
 
-✅ Los datos persisten después de reiniciar el servidor.
-✅ CRUD conectado directamente a PostgreSQL cloud.
-✅ Relaciones reales entre entidades.
-✅ Índices implementados en la base de datos.
-✅ Migraciones Prisma funcionando correctamente.
+# Pruebas Automatizadas
 
-Esto cumple los requisitos de persistencia cloud definidos en la consigna de la Actividad 3.
+Endpoints validados:
 
-Validaciones implementadas
-
-✅ Campos obligatorios en POST y PUT
-✅ Status codes correctos
-✅ Validación de IDs inexistentes
-✅ Manejo global de errores
-✅ Filtros y búsqueda
-✅ Paginación
-✅ Eventos Redis estructurados
-✅ Persistencia real en Supabase
-✅ Comunicación realtime Socket.IO
-
-Pruebas automatizadas
-
-El sistema implementa pruebas automatizadas utilizando Jest y Supertest.
-
-Endpoints validados
+```text
 GET /api/health
 GET /api/info
 GET /api/reportes
 PATCH /api/reportes/:id/estado
-Las pruebas verifican
-Integración completa con Express
-Persistencia en PostgreSQL
-Operaciones Prisma ORM
-Endpoints REST
-Flujo de actualización de estado
-Respuestas HTTP correctas
-Ejecución
-npm test
-Resultado esperado
-PASS pruebas/api.prueba.js
+```
+
+Resultado esperado:
+
+```text
+PASS
 4 passed
 0 failed
+```
 
-Las pruebas automatizadas permiten validar el funcionamiento básico de la API y garantizan estabilidad en los endpoints principales.
+---
 
-Docker y despliegue cloud
+# Evolución Histórica del Proyecto
 
-La aplicación fue preparada para futura contenerización mediante Docker, permitiendo despliegue portable en entornos cloud como:
+## v1.0.0 — Actividad 1
 
-AWS EC2 Free Tier
-Render
-VPS Linux
-Docker Desktop
-Próximamente
-Dockerfile
-docker-compose
-despliegue automatizado
-integración cloud
-Versionado del proyecto
+Implementación inicial:
 
-El proyecto fue desarrollado incrementalmente por actividades académicas utilizando versionado evolutivo basado en funcionalidades implementadas.
+* API REST
+* CRUD básico
+* Express
+* MVC
+* Swagger
+* Variables de entorno
+* Deploy inicial
 
-Actividad 1 — v1.0.0
+---
 
-Implementación inicial de la API REST:
+## v1.1.0
 
-CRUD básico de reportes
-Express.js
-Swagger/OpenAPI
-Arquitectura MVC
-Endpoints REST
-Variables de entorno
-Deploy inicial en Render
-Mejoras posteriores
-v1.1.0
-Búsqueda y filtros
-Paginación
-Mejoras de validación
-v1.2.0
-Caché Redis
-Invalidación automática
-Optimización GET /api/reportes
-Actividad 2 — v2.0.0
+* Búsqueda
+* Filtros
+* Paginación
 
-Integración de comunicación distribuida:
+---
 
-Redis Pub/Sub
-Eventos JSON estructurados
-Subscriber independiente
-Eventos en tiempo real
-Mejoras posteriores
-v2.1.0
-Socket.IO realtime
-Panel de notificaciones web
-Eventos tipados
-Mejoras de sincronización
-Actividad 3 — v3.0.0
+## v1.2.0
 
-Persistencia cloud y arquitectura avanzada:
+* Mejoras Swagger
+* Validaciones
 
-Prisma ORM
-Supabase PostgreSQL
-Migraciones
-Persistencia real cloud
-Relaciones entre entidades
-Cache distribuido Redis
-Endpoint seguimiento
-Endpoint PATCH estado
-Pruebas automatizadas Jest/Supertest
-Mejoras posteriores
-v3.1.0
-Seguimiento realtime
-Actualización de estado realtime
-Optimización de pruebas
-Mejoras Swagger/OpenAPI
-Próxima evolución — Actividad 4 (v4.0.0)
+---
 
-Planificado:
+## v2.0.0 — Actividad 2
 
-JWT Authentication
-Roles y permisos
-Middleware de seguridad
-CORS avanzado
-Protección de endpoints
-Validación avanzada
-Seguridad API REST
-Commits semánticos implementados
+Comunicación distribuida:
 
-Ejemplos de commits utilizados:
+* Redis Pub/Sub
+* Eventos JSON
+* Subscriber independiente
 
-feat: crear estructura inicial de la API
-feat: agregar swagger a la API
-feat: implementar redis pubsub en produccion
-feat: agregar socket io para tiempo real
+---
+
+## v2.1.0
+
+* Socket.IO
+* Tiempo real
+
+---
+
+## v2.2.0
+
+* Eventos estructurados
+* Mejoras realtime
+
+---
+
+## v3.0.0 — Actividad 3
+
+Persistencia Cloud:
+
+* Prisma ORM
+* PostgreSQL
+* Supabase
+* Migraciones
+* Relaciones
+
+---
+
+## v3.1.0
+
+* Seguimiento de reportes
+
+---
+
+## v3.2.0
+
+* Redis Cache
+
+---
+
+## v3.3.0
+
+* Jest
+* Supertest
+
+---
+
+## v3.4.0
+
+* Estado independiente mediante PATCH
+
+---
+
+## v3.5.0
+
+* Seguimientos realtime
+* Estado realtime
+
+---
+
+## v4.0.0 — Actividad 4
+
+Seguridad:
+
+* JWT Authentication
+* Register
+* Login
+
+---
+
+## v4.1.0
+
+* Refresh Token
+
+---
+
+## v4.2.0
+
+* Swagger Authorize
+* Bearer Authentication
+
+---
+
+## v4.3.0
+
+* Helmet
+* Rate Limiting
+
+---
+
+## v4.4.0
+
+* Logout Seguro
+* Redis Blacklist
+* Revocación de JWT
+* Protección avanzada de sesiones
+
+---
+
+# Commits Semánticos
+
+Ejemplos:
+
+```text
+feat: crear estructura inicial de la api
+feat: agregar swagger a la api
+feat: implementar redis pubsub
 feat: integrar prisma con supabase
-feat: agregar endpoints practicos de seguimiento y cambio de estado
-docs: actualizar readme con endpoints avanzados y pruebas
-fix: corregir configuracion prisma client
+feat: agregar socket io realtime
+feat: implementar jwt authentication
+feat: implementar refresh token
+feat: agregar helmet y rate limiting
+feat: implementar logout y blacklist jwt en redis
+docs: actualizar readme
+fix: corregir configuracion prisma
+```
 
-El historial Git utiliza commits semánticos siguiendo las recomendaciones de la guía y la rúbrica oficial.
+---
 
-Decisiones técnicas
-¿Por qué PostgreSQL y no memoria?
+# Decisiones Técnicas
 
-El almacenamiento en memoria pierde información al reiniciar el servidor.
+### ¿Por qué PostgreSQL?
 
-PostgreSQL garantiza persistencia real, relaciones entre tablas y escalabilidad.
+Persistencia real y relaciones estructuradas.
 
-¿Por qué Redis además de PostgreSQL?
+### ¿Por qué Redis?
 
-PostgreSQL almacena los datos persistentes, mientras Redis permite comunicación rápida en tiempo real mediante Pub/Sub sin sobrecargar la base de datos.
+Pub/Sub, Cache y Blacklist JWT.
 
-¿Por qué Prisma ORM?
+### ¿Por qué Prisma?
 
-Prisma simplifica el acceso a PostgreSQL mediante modelos tipados, migraciones automáticas y relaciones estructuradas.
+Migraciones automáticas y acceso tipado.
 
-¿Por qué Socket.IO?
+### ¿Por qué Socket.IO?
 
-Socket.IO permite actualizar la interfaz web automáticamente sin necesidad de recargar el navegador.
+Tiempo real sin recargar navegador.
 
-Autor
+### ¿Por qué JWT?
 
-Erick Bravo Borges
+Autenticación escalable sin sesiones tradicionales.
+
+### ¿Por qué Refresh Tokens?
+
+Renovación segura de sesiones.
+
+### ¿Por qué Redis Blacklist?
+
+Permite invalidar tokens antes de su expiración natural.
+
+---
+
+# Autor
+
+**Erick Bravo Borges**
+
 Programación IV
+
 Universidad Privada Domingo Savio
+
 Gestión 2026
