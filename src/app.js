@@ -6,6 +6,8 @@ const swaggerSpec = require('./docs/swagger');
 
 const reportesRoutes = require('./routes/reportes.routes');
 
+const authRoutes = require('./routes/auth.routes');
+
 const app = express();
 
 app.use(cors());
@@ -22,6 +24,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/reportes', reportesRoutes);
+
+app.use('/auth', authRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

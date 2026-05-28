@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
+const autenticar = require('../middlewares/autenticar');
+
 const {
     listarReportes,
     obtenerReportePorId,
@@ -59,7 +61,7 @@ router.get('/', listarReportes);
  *       400:
  *         description: Error de validación
  */
-router.post('/', crearReporte);
+router.post('/', autenticar, crearReporte);
 
 /**
  * @swagger
@@ -93,7 +95,7 @@ router.post('/', crearReporte);
  *       404:
  *         description: Reporte no encontrado
  */
-router.post('/seguimiento/:id', crearSeguimientoReporte);
+router.post('/seguimiento/:id', autenticar, crearSeguimientoReporte);
 
 /**
  * @swagger
@@ -126,7 +128,7 @@ router.post('/seguimiento/:id', crearSeguimientoReporte);
  *       404:
  *         description: Reporte no encontrado
  */
-router.patch('/:id/estado', actualizarEstadoReporte);
+router.patch('/:id/estado', autenticar, actualizarEstadoReporte);
 
 /**
  * @swagger
@@ -185,7 +187,7 @@ router.get('/:id', obtenerReportePorId);
  *       404:
  *         description: Reporte no encontrado
  */
-router.put('/:id', actualizarReporte);
+router.put('/:id', autenticar, actualizarReporte);
 
 /**
  * @swagger
@@ -206,6 +208,6 @@ router.put('/:id', actualizarReporte);
  *       404:
  *         description: Reporte no encontrado
  */
-router.delete('/:id', eliminarReporte);
+router.delete('/:id', autenticar, eliminarReporte);
 
 module.exports = router;

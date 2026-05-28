@@ -9,7 +9,6 @@
     "subscriber": "node src/redis/redis.subscriber.js",
     "test": "jest --detectOpenHandles --forceExit"
   },
-
   "jest": {
     "testMatch": [
       "**/pruebas/**/*.js"
@@ -21,10 +20,14 @@
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
     "ioredis": "^5.10.1",
+    "jsonwebtoken": "^9.0.3",
     "socket.io": "^4.8.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"

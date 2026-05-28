@@ -9,12 +9,15 @@ datasource db {
 }
 
 model Usuario {
-  id         Int        @id @default(autoincrement())
-  nombre     String
-  email      String     @unique
-  reportes   Reporte[]
+  id           Int        @id @default(autoincrement())
+  nombre       String
+  email        String     @unique
+  password     String?
 
-  createdAt  DateTime   @default(now())
+  reportes     Reporte[]
+  refreshTokens RefreshToken[]
+
+  createdAt    DateTime   @default(now())
 }
 
 model Categoria {
@@ -59,4 +62,15 @@ model SeguimientoReporte {
   createdAt   DateTime @default(now())
 
   @@index([reporteId])
+}
+
+model RefreshToken {
+  id          Int      @id @default(autoincrement())
+  token       String   @unique
+
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
 }
