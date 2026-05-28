@@ -8,10 +8,15 @@ const reportesRoutes = require('./routes/reportes.routes');
 
 const authRoutes = require('./routes/auth.routes');
 
+const helmet = require('helmet');
+const limitadorGeneral = require('./middlewares/rateLimit');
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(helmet());
+app.use(limitadorGeneral);
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
