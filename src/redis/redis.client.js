@@ -1,5 +1,31 @@
 const Redis = require('ioredis');
 
+const modoTest = process.env.NODE_ENV === 'test';
+
+if (modoTest) {
+
+    const redisMock = {
+        set: async () => null,
+        get: async () => null,
+        del: async () => null,
+        keys: async () => [],
+        ping: async () => 'PONG',
+        quit: async () => null,
+        publish: async () => null
+    };
+
+    module.exports = {
+        redis: redisMock,
+        guardarCache: async () => null,
+        obtenerCache: async () => null,
+        eliminarCache: async () => null,
+        eliminarCachePorPatron: async () => null,
+        agregarTokenBlacklist: async () => null,
+        verificarTokenBlacklist: async () => false
+    };
+
+} else {
+
 const redis = new Redis(process.env.REDIS_URL, {
     tls: {},
     retryStrategy: (times) => {
@@ -186,3 +212,4 @@ module.exports = {
     agregarTokenBlacklist,
     verificarTokenBlacklist
 };
+}

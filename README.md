@@ -743,6 +743,15 @@ Seguridad:
 
 ---
 
+## v4.4.1
+
+* Corrección de Content Security Policy (Helmet)
+* Migración de JavaScript inline a archivo externo
+* Restablecimiento de Socket.IO en producción
+* Compatibilidad completa con CSP
+
+---
+
 # Commits Semánticos
 
 Ejemplos:

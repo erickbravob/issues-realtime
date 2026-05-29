@@ -3,6 +3,32 @@ const app = require('../src/app');
 
 describe('Pruebas básicas de integración de la API', () => {
 
+    let token = '';
+
+    beforeAll(async () => {
+
+        const emailPrueba = `test${Date.now()}@upds.edu.bo`;
+        const passwordPrueba = 'clave123';
+
+        await request(app)
+            .post('/auth/register')
+            .send({
+                nombre: 'Usuario Test',
+                email: emailPrueba,
+                password: passwordPrueba
+            });
+
+        const login = await request(app)
+            .post('/auth/login')
+            .send({
+                email: emailPrueba,
+                password: passwordPrueba
+            });
+
+        token = login.body.token;
+
+    }, 15000);
+
     test('GET /api/health debe responder API activa', async () => {
 
         const res = await request(app).get('/api/health');
@@ -31,19 +57,39 @@ describe('Pruebas básicas de integración de la API', () => {
         expect(res.body.ok).toBe(true);
         expect(res.body).toHaveProperty('data');
 
+    }, 15000);
+
+    test('POST /api/reportes sin token debe devolver 401', async () => {
+
+        const res = await request(app)
+            .post('/api/reportes')
+            .send({
+                titulo: 'Reporte sin token',
+                descripcion: 'Debe ser rechazado',
+                ubicacion: 'Bloque Test',
+                categoria: 'Seguridad',
+                estado: 'Pendiente',
+                usuarioNombre: 'Usuario Test',
+                usuarioEmail: `sintoken${Date.now()}@upds.edu.bo`
+            });
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.ok).toBe(false);
+
     });
 
-    test('PATCH /api/reportes/:id/estado debe actualizar el estado del reporte', async () => {
+    test('PATCH /api/reportes/:id/estado debe actualizar el estado del reporte con JWT', async () => {
 
         const crearReporte = await request(app)
             .post('/api/reportes')
+            .set('Authorization', `Bearer ${token}`)
             .send({
                 titulo: 'Prueba estado',
                 descripcion: 'Reporte para prueba PATCH',
                 ubicacion: 'Bloque C',
                 categoria: 'Infraestructura',
                 estado: 'Pendiente',
-                usuarioNombre: 'Erick Bravo',
+                usuarioNombre: 'Usuario Test',
                 usuarioEmail: `erick${Date.now()}@upds.edu.bo`
             });
 
@@ -56,6 +102,7 @@ describe('Pruebas básicas de integración de la API', () => {
 
         const res = await request(app)
             .patch(`/api/reportes/${idReporte}/estado`)
+            .set('Authorization', `Bearer ${token}`)
             .send({
                 estado: 'Atendido'
             });

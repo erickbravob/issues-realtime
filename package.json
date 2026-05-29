@@ -7,7 +7,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "subscriber": "node src/redis/redis.subscriber.js",
-    "test": "jest --detectOpenHandles --forceExit"
+    "test": "set NODE_ENV=test&& jest --detectOpenHandles --forceExit"
   },
   "jest": {
     "testMatch": [
