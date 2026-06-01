@@ -1,75 +1,270 @@
+const socket = io();
 
-        const socket = io();
+const API_URL = '';
 
-        const estado = document.getElementById('estado');
-        const contenedor = document.getElementById('notificaciones');
+const btnLogin = document.getElementById('btnLogin');
+const btnLogout = document.getElementById('btnLogout');
 
-        socket.on('connect', () => {
-            estado.textContent = 'Conectado al servidor en tiempo real';
+const panelLogin = document.getElementById('panelLogin');
+const panelUsuario = document.getElementById('panelUsuario');
+
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+
+const mensajeLogin = document.getElementById('mensajeLogin');
+const usuarioActivo = document.getElementById('usuarioActivo');
+
+const estado = document.getElementById('estado');
+const contenedor = document.getElementById('notificaciones');
+
+const panelNuevoReporte =
+    document.getElementById('panelNuevoReporte');
+
+const tituloReporte =
+    document.getElementById('tituloReporte');
+
+const descripcionReporte =
+    document.getElementById('descripcionReporte');
+
+const ubicacionReporte =
+    document.getElementById('ubicacionReporte');
+
+const categoriaReporte =
+    document.getElementById('categoriaReporte');
+
+const btnCrearReporte =
+    document.getElementById('btnCrearReporte');
+
+const limpiarMensajeVacio = () => {
+
+    const vacio = contenedor.querySelector('.vacio');
+
+    if (vacio) {
+        vacio.remove();
+    }
+
+};
+
+socket.on('connect', () => {
+    estado.textContent = 'Conectado al servidor en tiempo real';
+});
+
+socket.on('disconnect', () => {
+    estado.textContent = 'Desconectado del servidor';
+});
+
+function mostrarNotificacionReporte(tituloEvento, evento) {
+
+    limpiarMensajeVacio();
+
+    const reporte = evento.payload;
+
+    const div = document.createElement('div');
+    div.className = 'notificacion';
+
+    div.innerHTML = `
+        <div class="titulo">${tituloEvento}: ${reporte.titulo || 'Sin título'}</div>
+        <div class="detalle"><strong>Descripción:</strong> ${reporte.descripcion || 'No registrada'}</div>
+        <div class="detalle"><strong>Ubicación:</strong> ${reporte.ubicacion || 'No registrada'}</div>
+        <div class="detalle"><strong>Categoría:</strong> ${reporte.categoria?.nombre || 'Sin categoría'}</div>
+        <div class="detalle"><strong>Estado:</strong> ${reporte.estado || 'No registrado'}</div>
+        <div class="detalle"><strong>Ejecutado por:</strong> ${reporte.usuarioEjecutor?.nombre || 'Usuario no identificado'}</div>
+        <div class="detalle"><strong>Email ejecutor:</strong> ${reporte.usuarioEjecutor?.email || 'No registrado'}</div>
+        <div class="detalle"><strong>Fecha evento:</strong> ${evento.timestamp}</div>
+    `;
+
+    contenedor.prepend(div);
+
+}
+
+function mostrarNotificacionSeguimiento(tituloEvento, evento) {
+
+    limpiarMensajeVacio();
+
+    const seguimiento = evento.payload;
+    const reporte = seguimiento.reporte || {};
+
+    const div = document.createElement('div');
+    div.className = 'notificacion';
+
+    div.innerHTML = `
+        <div class="titulo">${tituloEvento}: ${reporte.titulo || 'Reporte sin título'}</div>
+        <div class="detalle"><strong>Detalle:</strong> ${seguimiento.detalle || 'No registrado'}</div>
+        <div class="detalle"><strong>Responsable:</strong> ${seguimiento.responsable || 'No registrado'}</div>
+        <div class="detalle"><strong>Reporte ID:</strong> ${seguimiento.reporteId || 'No registrado'}</div>
+        <div class="detalle"><strong>Ubicación:</strong> ${reporte.ubicacion || 'No registrada'}</div>
+        <div class="detalle"><strong>Estado:</strong> ${reporte.estado || 'No registrado'}</div>
+        <div class="detalle"><strong>Fecha evento:</strong> ${evento.timestamp}</div>
+    `;
+
+    contenedor.prepend(div);
+
+}
+
+socket.on('reporte:creado', (evento) => {
+    mostrarNotificacionReporte('Nuevo reporte creado', evento);
+});
+
+socket.on('reporte:actualizado', (evento) => {
+    mostrarNotificacionReporte('Reporte actualizado', evento);
+});
+
+socket.on('reporte:eliminado', (evento) => {
+    mostrarNotificacionReporte('Reporte eliminado', evento);
+});
+
+socket.on('reporte:seguimiento_creado', (evento) => {
+    mostrarNotificacionSeguimiento('Seguimiento registrado', evento);
+});
+
+socket.on('reporte:estado_actualizado', (evento) => {
+    mostrarNotificacionReporte('Estado del reporte actualizado', evento);
+});
+
+btnLogin.addEventListener('click', async () => {
+
+    try {
+
+        mensajeLogin.textContent = 'Iniciando sesión...';
+
+        const respuesta = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email.value,
+                password: password.value
+            })
         });
 
-        socket.on('disconnect', () => {
-            estado.textContent = 'Desconectado del servidor';
-        });
+        const datos = await respuesta.json();
 
-        function mostrarNotificacionReporte(tituloEvento, evento) {
+        if (!datos.ok) {
 
-            const reporte = evento.payload;
-
-            const div = document.createElement('div');
-            div.className = 'notificacion';
-
-            div.innerHTML = `
-                <div class="titulo">${tituloEvento}: ${reporte.titulo}</div>
-                <div class="detalle"><strong>Descripción:</strong> ${reporte.descripcion}</div>
-                <div class="detalle"><strong>Ubicación:</strong> ${reporte.ubicacion}</div>
-                <div class="detalle"><strong>Categoría:</strong> ${reporte.categoria?.nombre || 'Sin categoría'}</div>
-                <div class="detalle"><strong>Estado:</strong> ${reporte.estado}</div>
-                <div class="detalle"><strong>Fecha evento:</strong> ${evento.timestamp}</div>
-            `;
-
-            contenedor.prepend(div);
+            mensajeLogin.textContent = datos.mensaje;
+            return;
 
         }
 
-        function mostrarNotificacionSeguimiento(tituloEvento, evento) {
+        localStorage.setItem('token', datos.token);
+        localStorage.setItem('refreshToken', datos.refreshToken);
 
-            const seguimiento = evento.payload;
-            const reporte = seguimiento.reporte || {};
+        localStorage.setItem(
+            'usuario',
+            JSON.stringify(datos.usuario)
+        );
 
-            const div = document.createElement('div');
-            div.className = 'notificacion';
+        mostrarUsuario();
 
-            div.innerHTML = `
-                <div class="titulo">${tituloEvento}: ${reporte.titulo || 'Reporte sin título'}</div>
-                <div class="detalle"><strong>Detalle:</strong> ${seguimiento.detalle}</div>
-                <div class="detalle"><strong>Responsable:</strong> ${seguimiento.responsable}</div>
-                <div class="detalle"><strong>Reporte ID:</strong> ${seguimiento.reporteId}</div>
-                <div class="detalle"><strong>Ubicación:</strong> ${reporte.ubicacion || 'No registrada'}</div>
-                <div class="detalle"><strong>Estado:</strong> ${reporte.estado || 'No registrado'}</div>
-                <div class="detalle"><strong>Fecha evento:</strong> ${evento.timestamp}</div>
-            `;
+        mensajeLogin.textContent = 'Login correcto';
 
-            contenedor.prepend(div);
+    } catch (error) {
+
+        mensajeLogin.textContent = 'Error al iniciar sesión';
+
+    }
+
+});
+
+function mostrarUsuario() {
+
+    const usuario = JSON.parse(
+        localStorage.getItem('usuario')
+    );
+
+    if (!usuario) {
+
+        panelLogin.classList.remove('oculto');
+        panelUsuario.classList.add('oculto');
+        panelNuevoReporte.classList.add('oculto');
+
+        return;
+
+    }
+
+    panelLogin.classList.add('oculto');
+    panelUsuario.classList.remove('oculto');
+    panelNuevoReporte.classList.remove('oculto');
+    
+    usuarioActivo.textContent =
+        `${usuario.nombre} (${usuario.email})`;
+
+}
+
+mostrarUsuario();
+
+btnLogout.addEventListener('click', async () => {
+
+    try {
+
+        const token = localStorage.getItem('token');
+
+        await fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('usuario');
+
+    mostrarUsuario();
+
+});
+
+btnCrearReporte.addEventListener('click', async () => {
+
+    try {
+
+        const token = localStorage.getItem('token');
+
+        const respuesta = await fetch('/api/reportes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                titulo: tituloReporte.value,
+                descripcion: descripcionReporte.value,
+                ubicacion: ubicacionReporte.value,
+                categoria: categoriaReporte.value,
+                estado: 'Pendiente',
+                usuarioNombre: JSON.parse(localStorage.getItem('usuario')).nombre,
+                usuarioEmail: JSON.parse(localStorage.getItem('usuario')).email
+            })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!datos.ok) {
+
+            alert(datos.mensaje);
+            return;
 
         }
 
-        socket.on('reporte:creado', (evento) => {
-            mostrarNotificacionReporte('Nuevo reporte creado', evento);
-        });
+        tituloReporte.value = '';
+        descripcionReporte.value = '';
+        ubicacionReporte.value = '';
 
-        socket.on('reporte:actualizado', (evento) => {
-            mostrarNotificacionReporte('Reporte actualizado', evento);
-        });
+        alert('Reporte registrado correctamente');
 
-        socket.on('reporte:eliminado', (evento) => {
-            mostrarNotificacionReporte('Reporte eliminado', evento);
-        });
+    } catch (error) {
 
-        socket.on('reporte:seguimiento_creado', (evento) => {
-            mostrarNotificacionSeguimiento('Seguimiento registrado', evento);
-        });
+        console.error(error);
 
-        socket.on('reporte:estado_actualizado', (evento) => {
-            mostrarNotificacionReporte('Estado del reporte actualizado', evento);
-        }); 
+        alert('Error al registrar reporte');
+
+    }
+
+});

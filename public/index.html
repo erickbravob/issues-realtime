@@ -2,54 +2,224 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Notificaciones de Infraestructura</title>
+    <title>Issues Realtime - CampusFix</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            padding: 30px;
+        * {
+            box-sizing: border-box;
         }
 
-        h1 {
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
             color: #1f2937;
         }
 
+        header {
+            background: #1d4ed8;
+            color: white;
+            padding: 24px 40px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        header p {
+            margin: 8px 0 0;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 30px 40px;
+        }
+
         .estado {
-            padding: 10px;
+            padding: 14px 16px;
             background: #e0f2fe;
-            border-left: 5px solid #0284c7;
-            margin-bottom: 20px;
+            border-left: 6px solid #0284c7;
+            margin-bottom: 24px;
+            font-weight: bold;
+        }
+
+        .contenedor {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #0f172a;
         }
 
         .notificacion {
-            background: white;
-            border-left: 5px solid #16a34a;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            background: #ffffff;
+            border-left: 6px solid #16a34a;
+            padding: 16px;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .titulo {
             font-weight: bold;
             color: #111827;
+            font-size: 18px;
+            margin-bottom: 8px;
         }
 
         .detalle {
             color: #374151;
             margin-top: 5px;
+            line-height: 1.4;
         }
+
+        .vacio {
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .formulario {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    margin-top: 12px;
+    }
+
+    input {
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    button {
+        padding: 12px 18px;
+        border: none;
+        border-radius: 8px;
+        background: #1d4ed8;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1e40af;
+    }
+
+    .mensaje {
+        margin-top: 12px;
+        font-weight: bold;
+    }
+
+    .oculto {
+        display: none;
+    }
+
+    .formulario-reporte {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+    }
+
     </style>
 </head>
 <body>
 
-    <h1>Panel de Notificaciones en Tiempo Real</h1>
+    <header>
+        <h1>CampusFix - Issues Realtime</h1>
+        <p>Sistema de reportes de infraestructura universitaria con notificaciones en tiempo real</p>
+    </header>
 
-    <div class="estado" id="estado">
-        Conectando con Socket.IO...
-    </div>
+    <main>
+        <div class="estado" id="estado">
+            Conectando con Socket.IO...
+        </div>
 
-    <div id="notificaciones"></div>
+        <section class="panel" id="panelLogin">
+            <h2>Acceso al sistema</h2>
+
+            <div class="formulario">
+                <input type="email" id="email" placeholder="Correo electrónico" value="erick@upds.edu.bo">
+                <input type="password" id="password" placeholder="Contraseña" value="clave123">
+                <button id="btnLogin">Iniciar sesión</button>
+            </div>
+
+            <p id="mensajeLogin" class="mensaje"></p>
+        </section>
+
+        <section class="panel oculto" id="panelUsuario">
+            <h2>Usuario autenticado</h2>
+            <p id="usuarioActivo"></p>
+            <button id="btnLogout">Cerrar sesión</button>
+        </section>
+
+        <section class="panel oculto" id="panelNuevoReporte">
+
+        <h2>Registrar incidencia</h2>
+
+        <div class="formulario-reporte">
+
+            <input
+                type="text"
+                id="tituloReporte"
+                placeholder="Título del reporte"
+            >
+
+            <input
+                type="text"
+                id="ubicacionReporte"
+                placeholder="Ubicación"
+            >
+
+            <input
+                type="text"
+                id="categoriaReporte"
+                placeholder="Categoría"
+                value="Infraestructura"
+            >
+
+            <textarea
+                id="descripcionReporte"
+                placeholder="Descripción del problema"
+            ></textarea>
+
+            <button id="btnCrearReporte">
+                Registrar Reporte
+            </button>
+
+        </div>
+
+    </section>
+
+        <section class="contenedor">
+            <div class="panel">
+                <h2>Panel de Notificaciones en Tiempo Real</h2>
+                <div id="notificaciones">
+                    <p class="vacio">Aún no se recibieron eventos en tiempo real.</p>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/app.js"></script>

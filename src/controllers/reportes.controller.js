@@ -198,7 +198,14 @@ const crearReporte = async (req, res) => {
     await publicarEvento(
         'infra:reportes',
         'infra:reporte:creado',
-        nuevoReporte
+        {
+            ...nuevoReporte,
+            usuarioEjecutor: {
+                id: req.usuario.id,
+                nombre: req.usuario.nombre,
+                email: req.usuario.email
+            }
+        }
     );
 
     await publicarEvento(
@@ -206,7 +213,12 @@ const crearReporte = async (req, res) => {
         'infra:notificacion:mantenimiento',
         {
             mensaje: 'Nuevo reporte de infraestructura registrado',
-            reporte: nuevoReporte
+            reporte: nuevoReporte,
+            usuarioEjecutor: {
+                id: req.usuario.id,
+                nombre: req.usuario.nombre,
+                email: req.usuario.email
+            }
         }
     );
 
@@ -214,12 +226,19 @@ const crearReporte = async (req, res) => {
 
     if (io) {
 
-        io.emit('reporte:creado', {
-            tipo: 'infra:reporte:creado',
-            payload: nuevoReporte,
-            timestamp: new Date().toISOString(),
-            version: '1.0'
-        });
+io.emit('reporte:creado', {
+    tipo: 'infra:reporte:creado',
+    payload: {
+        ...nuevoReporte,
+        usuarioEjecutor: {
+            id: req.usuario.id,
+            nombre: req.usuario.nombre,
+            email: req.usuario.email
+        }
+    },
+    timestamp: new Date().toISOString(),
+    version: '1.0'
+});
 
     }
 
