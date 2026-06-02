@@ -321,7 +321,8 @@ const cargarReportes = async () => {
                 <td>
 
                 <select
-                    onchange="actualizarEstado(${reporte.id}, this.value)"
+                    class="selectEstado"
+                    data-id="${reporte.id}"
                 >
                     <option
                         value="Pendiente"
@@ -348,6 +349,14 @@ const cargarReportes = async () => {
 
             </td>
                 <td>${reporte.usuario?.nombre || 'Sin usuario'}</td>
+                <td>
+                    <button
+                        class="btnSeguimiento"
+                        data-id="${reporte.id}"
+                    >
+                        Seguimiento
+                    </button>
+                </td>
             `;
 
             tablaReportes.appendChild(fila);
@@ -414,8 +423,96 @@ window.actualizarEstado = async (
 
 };
 
+window.registrarSeguimiento = async (idReporte) => {
+
+    const detalle = prompt(
+        'Ingrese el detalle del seguimiento'
+    );
+
+    if (!detalle) {
+        return;
+    }
+
+    const responsable = prompt(
+        'Ingrese el responsable'
+    );
+
+    if (!responsable) {
+        return;
+    }
+
+    try {
+
+        const token =
+            localStorage.getItem('token');
+
+        const respuesta = await fetch(
+            `/api/reportes/seguimiento/${idReporte}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    detalle,
+                    responsable
+                })
+            }
+        );
+
+        const datos =
+            await respuesta.json();
+
+        if (!datos.ok) {
+
+            alert(datos.mensaje);
+            return;
+
+        }
+
+        alert(
+            'Seguimiento registrado correctamente'
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Error registrando seguimiento'
+        );
+
+    }
+
+};
+
 btnCargarReportes.addEventListener('click', () => {
     cargarReportes();
+});
+
+tablaReportes.addEventListener('click', (event) => {
+
+    const boton = event.target.closest('.btnSeguimiento');
+
+    if (!boton) {
+        return;
+    }
+
+    registrarSeguimiento(boton.dataset.id);
+
+});
+
+tablaReportes.addEventListener('change', (event) => {
+
+    const select = event.target.closest('.selectEstado');
+
+    if (!select) {
+        return;
+    }
+
+    actualizarEstado(select.dataset.id, select.value);
+
 });
 
 mostrarUsuario();
