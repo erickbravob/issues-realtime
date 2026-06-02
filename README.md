@@ -845,7 +845,7 @@ Seguridad:
 
 ---
 
-## v5.4.0 — Dashboard Ejecutivo
+## v5.4.0
 
 * Visualización de últimos reportes registrados
 * Indicadores generales por estado
@@ -857,7 +857,7 @@ Seguridad:
 
 ---
 
-## v5.5.0 — Dashboard Analítico
+## v5.5.0
 
 * Ranking de incidencias por categoría
 * Visualización gráfica de categorías más reportadas
@@ -868,7 +868,7 @@ Seguridad:
 
 ---
 
-## v5.5.1 — Ranking de Incidencias por Ubicación
+## v5.5.1
 
 * Ranking de ubicaciones con mayor cantidad de incidencias
 * Visualización gráfica mediante barras HTML/CSS
@@ -879,7 +879,7 @@ Seguridad:
 
 ---
 
-## v5.6.0 — Administración de Usuarios
+## v5.6.0
 
 * Consulta de usuarios registrados mediante Prisma ORM
 * Resumen de cantidad de reportes por usuario
@@ -889,6 +889,12 @@ Seguridad:
 * Estadísticas de participación por usuario
 * Integración con Dashboard General
 * Compatible con Helmet CSP
+
+---
+
+## v5.6.1
+
+* Top Usuarios Reportantes
 
 ---
 
