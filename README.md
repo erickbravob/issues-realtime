@@ -778,6 +778,61 @@ Seguridad:
 
 ---
 
+## 5.0.0 — Proyecto Final: Frontend Web Integrado
+
+* Creación de interfaz web completa para el sistema CampusFix
+* Inicio de sesión desde frontend utilizando JWT
+* Persistencia de sesión mediante localStorage
+* Integración de Refresh Token desde cliente web
+* Cierre de sesión seguro utilizando Redis Blacklist
+* Visualización de usuario autenticado
+* Registro de reportes desde interfaz gráfica
+* Integración completa con API REST existente
+* Consumo de servicios protegidos mediante Bearer Token
+* Compatibilidad con políticas de seguridad Helmet
+* Eliminación de dependencia exclusiva de Swagger para operar el sistema
+
+---
+
+## v5.1.0
+
+* Implementación de historial de reportes desde frontend
+* Consulta dinámica de reportes almacenados en Supabase
+* Tabla administrativa para gestión de incidencias
+* Cambio de estado de reportes desde interfaz web
+* Integración de actualización de estados mediante PATCH
+* Dashboard de indicadores generales
+* Conteo automático de reportes Totales
+* Conteo automático de reportes Pendientes
+* Conteo automático de reportes En Proceso
+* Conteo automático de reportes Atendidos
+* Actualización automática de indicadores después de operaciones del sistema
+* Integración visual con Socket.IO para monitoreo en tiempo real
+
+---
+
+## v5.1.1
+
+* Corrección de actualización automática del dashboard
+* Actualización de indicadores después de registrar reportes
+* Actualización de indicadores después de registrar seguimientos
+* Sincronización automática de la tabla de reportes
+* Mejoras de estabilidad del frontend
+
+---
+
+## v5.2.0
+
+* Modal de seguimiento
+* Eliminación de prompts
+* UI profesional
+* Registro de seguimientos desde formulario
+* Compatible con Helmet CSP
+* Integrado con Socket.IO
+* Integrado con Redis Pub/Sub
+
+---
+
 # Commits Semánticos
 
 Ejemplos:
