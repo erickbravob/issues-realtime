@@ -168,6 +168,32 @@
         background: #f8fafc;
     }
 
+    .dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    }
+
+    .tarjeta {
+        background: #2563eb;
+        color: white;
+        padding: 24px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .tarjeta h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .tarjeta span {
+        display: block;
+        margin-top: 12px;
+        font-size: 36px;
+        font-weight: bold;
+    }
+
     </style>
 </head>
 <body>
@@ -181,6 +207,36 @@
         <div class="estado" id="estado">
             Conectando con Socket.IO...
         </div>
+
+        <section class="panel oculto" id="panelDashboard">
+
+            <h2>Indicadores Generales</h2>
+
+            <div class="dashboard">
+
+                <div class="tarjeta">
+                    <h3>Total</h3>
+                    <span id="totalReportes">0</span>
+                </div>
+
+                <div class="tarjeta">
+                    <h3>Pendientes</h3>
+                    <span id="totalPendientes">0</span>
+                </div>
+
+                <div class="tarjeta">
+                    <h3>En Proceso</h3>
+                    <span id="totalProceso">0</span>
+                </div>
+
+                <div class="tarjeta">
+                    <h3>Atendidos</h3>
+                    <span id="totalAtendidos">0</span>
+                </div>
+
+            </div>
+
+        </section>
 
         <section class="panel" id="panelLogin">
             <h2>Acceso al sistema</h2>

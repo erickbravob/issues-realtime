@@ -33,6 +33,21 @@ const btnCrearReporte =
 const panelReportes = document.getElementById('panelReportes');
 const btnCargarReportes = document.getElementById('btnCargarReportes');
 const tablaReportes = document.getElementById('tablaReportes');
+
+const panelDashboard =
+    document.getElementById('panelDashboard');
+
+const totalReportes =
+    document.getElementById('totalReportes');
+
+const totalPendientes =
+    document.getElementById('totalPendientes');
+
+const totalProceso =
+    document.getElementById('totalProceso');
+
+const totalAtendidos =
+    document.getElementById('totalAtendidos');
     
 const limpiarMensajeVacio = () => {
 
@@ -178,6 +193,7 @@ function mostrarUsuario() {
         panelUsuario.classList.add('oculto');
         panelNuevoReporte.classList.add('oculto');
         panelReportes.classList.add('oculto');
+        panelDashboard.classList.add('oculto');
 
         return;
 
@@ -187,6 +203,8 @@ function mostrarUsuario() {
     panelUsuario.classList.remove('oculto');
     panelNuevoReporte.classList.remove('oculto');
     panelReportes.classList.remove('oculto');
+    panelDashboard.classList.remove('oculto');
+
     cargarReportes();
     
     usuarioActivo.textContent =
@@ -283,6 +301,8 @@ const cargarReportes = async () => {
 
         const datos = await respuesta.json();
 
+        actualizarDashboard(datos.data || []);
+
         if (!datos.ok) {
 
             tablaReportes.innerHTML = `
@@ -372,7 +392,6 @@ const cargarReportes = async () => {
         `;
 
     }
-
 };
 
 window.actualizarEstado = async (
@@ -420,6 +439,29 @@ window.actualizarEstado = async (
         );
 
     }
+
+};
+
+    const actualizarDashboard = (reportes) => {
+
+    const total = reportes.length;
+
+    const pendientes = reportes.filter(
+        reporte => reporte.estado === 'Pendiente'
+    ).length;
+
+    const enProceso = reportes.filter(
+        reporte => reporte.estado === 'En Proceso'
+    ).length;
+
+    const atendidos = reportes.filter(
+        reporte => reporte.estado === 'Atendido'
+    ).length;
+
+    totalReportes.textContent = total;
+    totalPendientes.textContent = pendientes;
+    totalProceso.textContent = enProceso;
+    totalAtendidos.textContent = atendidos;
 
 };
 
