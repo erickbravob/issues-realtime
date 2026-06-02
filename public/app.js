@@ -83,6 +83,12 @@ const graficoCategorias =
 const graficoUbicaciones =
     document.getElementById('graficoUbicaciones');
 
+const panelUsuarios =
+    document.getElementById('panelUsuarios');
+
+const tablaUsuarios =
+    document.getElementById('tablaUsuarios');
+
 let reportesOriginales = [];
 
 socket.on('connect', () => {
@@ -220,6 +226,7 @@ function mostrarUsuario() {
         panelNuevoReporte.classList.add('oculto');
         panelReportes.classList.add('oculto');
         panelDashboard.classList.add('oculto');
+        panelUsuarios.classList.add('oculto');
 
         return;
 
@@ -230,8 +237,10 @@ function mostrarUsuario() {
     panelNuevoReporte.classList.remove('oculto');
     panelReportes.classList.remove('oculto');
     panelDashboard.classList.remove('oculto');
+    panelUsuarios.classList.remove('oculto');
 
     cargarReportes();
+    cargarUsuarios();
     
     usuarioActivo.textContent =
         `${usuario.nombre} (${usuario.email})`;
@@ -370,6 +379,58 @@ const cargarReportes = async () => {
         `;
 
     }
+};
+
+const cargarUsuarios = async () => {
+
+    try {
+
+        const token =
+            localStorage.getItem('token');
+
+        const respuesta = await fetch(
+            '/api/reportes/usuarios/resumen',
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const datos =
+            await respuesta.json();
+
+        if (!datos.ok) {
+
+            return;
+
+        }
+
+        tablaUsuarios.innerHTML = '';
+
+        datos.data.forEach((usuario) => {
+
+            const fila =
+                document.createElement('tr');
+
+            fila.innerHTML = `
+                <td>${usuario.id}</td>
+                <td>${usuario.nombre}</td>
+                <td>${usuario.email}</td>
+                <td>${new Date(usuario.createdAt).toLocaleDateString()}</td>
+                <td>${usuario._count.reportes}</td>
+            `;
+
+            tablaUsuarios.appendChild(fila);
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
 };
 
 window.actualizarEstado = async (

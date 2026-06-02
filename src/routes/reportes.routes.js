@@ -11,7 +11,8 @@ const {
     actualizarReporte,
     eliminarReporte,
     crearSeguimientoReporte,
-    actualizarEstadoReporte
+    actualizarEstadoReporte,
+    listarUsuariosResumen
 } = require('../controllers/reportes.controller');
 
 /**
@@ -129,6 +130,23 @@ router.post('/seguimiento/:id', autenticar, crearSeguimientoReporte);
  *         description: Reporte no encontrado
  */
 router.patch('/:id/estado', autenticar, actualizarEstadoReporte);
+
+/**
+ * @swagger
+ * /api/reportes/usuarios/resumen:
+ *   get:
+ *     summary: Obtener resumen de usuarios y cantidad de reportes
+ *     tags:
+ *       - Usuarios
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Resumen de usuarios obtenido correctamente
+ *       401:
+ *         description: Token inválido, expirado o no enviado
+ */
+router.get('/usuarios/resumen', autenticar, listarUsuariosResumen);
 
 /**
  * @swagger

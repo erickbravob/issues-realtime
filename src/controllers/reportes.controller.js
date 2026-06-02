@@ -596,6 +596,32 @@ const actualizarEstadoReporte = async (req, res) => {
 
 };
 
+const listarUsuariosResumen = async (req, res) => {
+
+    const usuarios = await prisma.usuario.findMany({
+        select: {
+            id: true,
+            nombre: true,
+            email: true,
+            createdAt: true,
+            _count: {
+                select: {
+                    reportes: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+
+    res.status(200).json({
+        ok: true,
+        data: usuarios
+    });
+
+};
+
 module.exports = {
     listarReportes,
     obtenerReportePorId,
@@ -603,5 +629,6 @@ module.exports = {
     actualizarReporte,
     eliminarReporte,
     crearSeguimientoReporte,
-    actualizarEstadoReporte
+    actualizarEstadoReporte,
+    listarUsuariosResumen
 };
