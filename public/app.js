@@ -77,6 +77,9 @@ const limpiarMensajeVacio = () => {
 const graficoEstadosCanvas =
     document.getElementById('graficoEstados');
 
+const graficoCategorias =
+    document.getElementById('graficoCategorias');
+
 let reportesOriginales = [];
 
 socket.on('connect', () => {
@@ -326,6 +329,7 @@ const cargarReportes = async () => {
         actualizarDashboard(datos.data || []);
         actualizarUltimosReportes(datos.data || []);
         actualizarGraficoEstados(datos.data || []);
+        actualizarGraficoCategorias(datos.data || []);
 
         if (!datos.ok) {
 
@@ -511,6 +515,64 @@ const actualizarGraficoEstados = (reportes) => {
     `;
 
 };
+
+    const actualizarGraficoCategorias = (reportes) => {
+
+        const categorias = {};
+
+        reportes.forEach((reporte) => {
+
+            const nombreCategoria =
+                reporte.categoria?.nombre ||
+                'Sin categoría';
+
+            categorias[nombreCategoria] =
+                (categorias[nombreCategoria] || 0) + 1;
+
+        });
+
+        const datos =
+            Object.entries(categorias);
+
+        if (datos.length === 0) {
+
+            graficoCategorias.innerHTML =
+                '<p class="vacio">No hay datos disponibles.</p>';
+
+            return;
+
+        }
+
+        const maximo =
+            Math.max(
+                ...datos.map(item => item[1]),
+                1
+            );
+
+        graficoCategorias.innerHTML = '';
+
+        datos.forEach(([nombre, cantidad]) => {
+
+            const fila =
+                document.createElement('div');
+
+            fila.className =
+                'barra-estado';
+
+            fila.innerHTML = `
+                <strong>${nombre}</strong>
+                <div
+                    class="barra"
+                    style="width:${(cantidad / maximo) * 100}%"
+                ></div>
+                <span>${cantidad}</span>
+            `;
+
+            graficoCategorias.appendChild(fila);
+
+        });
+
+    };
 
         const aplicarFiltros = () => {
 
