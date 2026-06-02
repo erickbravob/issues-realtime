@@ -845,6 +845,18 @@ Seguridad:
 
 ---
 
+## v5.4.0 — Dashboard Ejecutivo
+
+* Visualización de últimos reportes registrados
+* Indicadores generales por estado
+* Distribución visual de reportes por estado
+* Gráfico compatible con Helmet CSP sin librerías externas
+* Eliminación de dependencia de Chart.js por restricciones de seguridad
+* Dashboard integrado con datos reales desde Supabase
+* Actualización automática de indicadores después de operaciones del sistema
+
+---
+
 # Commits Semánticos
 
 Ejemplos:
