@@ -141,6 +141,33 @@
         border-radius: 8px;
     }
 
+    .tabla-contenedor {
+    margin-top: 16px;
+    overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th {
+        background: #1e3a8a;
+        color: white;
+        text-align: left;
+        padding: 12px;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr:hover {
+        background: #f8fafc;
+    }
+
     </style>
 </head>
 <body>
@@ -177,39 +204,67 @@
 
         <h2>Registrar incidencia</h2>
 
-        <div class="formulario-reporte">
+            <div class="formulario-reporte">
 
-            <input
-                type="text"
-                id="tituloReporte"
-                placeholder="Título del reporte"
-            >
+                <input
+                    type="text"
+                    id="tituloReporte"
+                    placeholder="Título del reporte"
+                >
 
-            <input
-                type="text"
-                id="ubicacionReporte"
-                placeholder="Ubicación"
-            >
+                <input
+                    type="text"
+                    id="ubicacionReporte"
+                    placeholder="Ubicación"
+                >
 
-            <input
-                type="text"
-                id="categoriaReporte"
-                placeholder="Categoría"
-                value="Infraestructura"
-            >
+                <input
+                    type="text"
+                    id="categoriaReporte"
+                    placeholder="Categoría"
+                    value="Infraestructura"
+                >
 
-            <textarea
-                id="descripcionReporte"
-                placeholder="Descripción del problema"
-            ></textarea>
+                <textarea
+                    id="descripcionReporte"
+                    placeholder="Descripción del problema"
+                ></textarea>
 
-            <button id="btnCrearReporte">
-                Registrar Reporte
+                <button id="btnCrearReporte">
+                    Registrar Reporte
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="panel oculto" id="panelReportes">
+            <h2>Historial de Reportes</h2>
+
+            <button id="btnCargarReportes">
+                Actualizar listado
             </button>
 
-        </div>
-
-    </section>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Ubicación</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Registrado por</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaReportes">
+                        <tr>
+                            <td colspan="6">No hay reportes cargados.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
         <section class="contenedor">
             <div class="panel">

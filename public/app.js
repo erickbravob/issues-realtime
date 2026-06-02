@@ -19,22 +19,21 @@ const contenedor = document.getElementById('notificaciones');
 
 const panelNuevoReporte =
     document.getElementById('panelNuevoReporte');
-
 const tituloReporte =
     document.getElementById('tituloReporte');
-
 const descripcionReporte =
     document.getElementById('descripcionReporte');
-
 const ubicacionReporte =
     document.getElementById('ubicacionReporte');
-
 const categoriaReporte =
     document.getElementById('categoriaReporte');
-
 const btnCrearReporte =
     document.getElementById('btnCrearReporte');
 
+const panelReportes = document.getElementById('panelReportes');
+const btnCargarReportes = document.getElementById('btnCargarReportes');
+const tablaReportes = document.getElementById('tablaReportes');
+    
 const limpiarMensajeVacio = () => {
 
     const vacio = contenedor.querySelector('.vacio');
@@ -178,6 +177,7 @@ function mostrarUsuario() {
         panelLogin.classList.remove('oculto');
         panelUsuario.classList.add('oculto');
         panelNuevoReporte.classList.add('oculto');
+        panelReportes.classList.add('oculto');
 
         return;
 
@@ -186,13 +186,13 @@ function mostrarUsuario() {
     panelLogin.classList.add('oculto');
     panelUsuario.classList.remove('oculto');
     panelNuevoReporte.classList.remove('oculto');
+    panelReportes.classList.remove('oculto');
+    cargarReportes();
     
     usuarioActivo.textContent =
         `${usuario.nombre} (${usuario.email})`;
 
 }
-
-mostrarUsuario();
 
 btnLogout.addEventListener('click', async () => {
 
@@ -268,3 +268,155 @@ btnCrearReporte.addEventListener('click', async () => {
     }
 
 });
+
+const cargarReportes = async () => {
+
+    try {
+
+        tablaReportes.innerHTML = `
+            <tr>
+                <td colspan="6">Cargando reportes...</td>
+            </tr>
+        `;
+
+        const respuesta = await fetch('/api/reportes');
+
+        const datos = await respuesta.json();
+
+        if (!datos.ok) {
+
+            tablaReportes.innerHTML = `
+                <tr>
+                    <td colspan="6">${datos.mensaje || 'No se pudieron cargar los reportes'}</td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        if (!datos.data || datos.data.length === 0) {
+
+            tablaReportes.innerHTML = `
+                <tr>
+                    <td colspan="6">No existen reportes registrados.</td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        tablaReportes.innerHTML = '';
+
+        datos.data.forEach((reporte) => {
+
+            const fila = document.createElement('tr');
+
+            fila.innerHTML = `
+                <td>${reporte.id}</td>
+                <td>${reporte.titulo}</td>
+                <td>${reporte.ubicacion}</td>
+                <td>${reporte.categoria?.nombre || 'Sin categoría'}</td>
+                <td>
+
+                <select
+                    onchange="actualizarEstado(${reporte.id}, this.value)"
+                >
+                    <option
+                        value="Pendiente"
+                        ${reporte.estado === 'Pendiente' ? 'selected' : ''}
+                    >
+                        Pendiente
+                    </option>
+
+                    <option
+                        value="En Proceso"
+                        ${reporte.estado === 'En Proceso' ? 'selected' : ''}
+                    >
+                        En Proceso
+                    </option>
+
+                    <option
+                        value="Atendido"
+                        ${reporte.estado === 'Atendido' ? 'selected' : ''}
+                    >
+                        Atendido
+                    </option>
+
+                </select>
+
+            </td>
+                <td>${reporte.usuario?.nombre || 'Sin usuario'}</td>
+            `;
+
+            tablaReportes.appendChild(fila);
+
+        });
+
+    } catch (error) {
+
+        tablaReportes.innerHTML = `
+            <tr>
+                <td colspan="6">Error al cargar reportes.</td>
+            </tr>
+        `;
+
+    }
+
+};
+
+window.actualizarEstado = async (
+    idReporte,
+    nuevoEstado
+) => {
+
+    try {
+
+        const token =
+            localStorage.getItem('token');
+
+        const respuesta = await fetch(
+            `/api/reportes/${idReporte}/estado`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    estado: nuevoEstado
+                })
+            }
+        );
+
+        const datos =
+            await respuesta.json();
+
+        if (!datos.ok) {
+
+            alert(datos.mensaje);
+            return;
+
+        }
+
+        cargarReportes();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Error actualizando estado'
+        );
+
+    }
+
+};
+
+btnCargarReportes.addEventListener('click', () => {
+    cargarReportes();
+});
+
+mostrarUsuario();
+
