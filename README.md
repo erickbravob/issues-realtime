@@ -894,7 +894,13 @@ Seguridad:
 
 ## v5.6.1
 
-* Top Usuarios Reportantes
+* Ranking de usuarios con mayor cantidad de incidencias registradas
+* Visualización gráfica mediante barras HTML/CSS
+* Estadísticas obtenidas desde Prisma ORM
+* Integración con módulo de usuarios
+* Dashboard analítico de participación
+* Compatible con Helmet CSP
+* Actualización automática durante la carga de usuarios
 
 ---
 
