@@ -1,4 +1,4 @@
-# API REST — Issues Realtime v4.4.0
+# API REST — Issues Realtime v5.0.0
 
 ## Programación IV – Universidad Privada Domingo Savio (UPDS)
 
@@ -46,24 +46,25 @@ Digitalizar el proceso de reporte y seguimiento de incidencias de infraestructur
 
 # Tecnologías Utilizadas
 
-| Tecnología            | Uso                     |
-| --------------------- | ----------------------- |
-| Node.js               | Entorno de ejecución    |
-| Express.js            | API REST                |
-| Prisma ORM            | Acceso a datos          |
-| PostgreSQL (Supabase) | Persistencia cloud      |
-| Redis (Upstash)       | Cache y Pub/Sub         |
-| Socket.IO             | Tiempo real             |
-| Swagger/OpenAPI       | Documentación           |
-| JWT                   | Autenticación           |
-| bcryptjs              | Cifrado de contraseñas  |
-| Helmet                | Seguridad HTTP          |
-| Express Rate Limit    | Protección contra abuso |
-| Jest                  | Pruebas automatizadas   |
-| Supertest             | Testing API             |
-| dotenv                | Variables de entorno    |
-| Git/GitHub            | Versionamiento          |
-| Render                | Despliegue cloud        |
+| Tecnología                  | Uso                         |
+| ---------------------       | -----------------------     |
+| Node.js                     | Entorno de ejecución        |
+| Express.js                  | API REST                    |
+| Prisma ORM                  | Acceso a datos              |
+| PostgreSQL (Supabase)       | Persistencia cloud          |
+| Redis (Upstash)             | Cache y Pub/Sub             |
+| Socket.IO                   | Tiempo real                 |
+| Swagger/OpenAPI             | Documentación               |
+| JWT                         | Autenticación               |
+| bcryptjs                    | Cifrado de contraseñas      |
+| Helmet                      | Seguridad HTTP              |
+| Express Rate Limit          | Protección contra abuso     |
+| Jest                        | Pruebas automatizadas       |
+| Supertest                   | Testing API                 |
+| dotenv                      | Variables de entorno        |
+| Git/GitHub                  | Versionamiento              |
+| Render                      | Despliegue cloud            |
+| HTML5 / CSS3 / JavaScript   | Frontend web                |
 
 ---
 
@@ -119,6 +120,7 @@ ISSUES_REALTIME/
 │
 ├── public/
 │   └── index.html
+│   └── app.js
 │
 ├── src/
 │
@@ -316,6 +318,30 @@ Campos:
 ✅ Variables de entorno
 
 ✅ Arquitectura MVC
+
+---
+
+## Frontend Web
+
+✅ Login desde interfaz web
+
+✅ Persistencia de sesión en localStorage
+
+✅ Logout integrado con Redis Blacklist
+
+✅ Registro de incidencias
+
+✅ Historial de reportes
+
+✅ Cambio de estado
+
+✅ Registro de seguimientos
+
+✅ Dashboard de indicadores
+
+✅ Notificaciones en tiempo real
+
+✅ Compatible con Content Security Policy de Helmet
 
 ---
 
