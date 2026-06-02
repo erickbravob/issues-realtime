@@ -879,6 +879,19 @@ Seguridad:
 
 ---
 
+## v5.6.0 — Administración de Usuarios
+
+* Consulta de usuarios registrados mediante Prisma ORM
+* Resumen de cantidad de reportes por usuario
+* Integración con endpoint protegido mediante JWT
+* Visualización de usuarios registrados en el frontend
+* Tabla administrativa de usuarios
+* Estadísticas de participación por usuario
+* Integración con Dashboard General
+* Compatible con Helmet CSP
+
+---
+
 # Commits Semánticos
 
 Ejemplos:
