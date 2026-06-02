@@ -48,6 +48,13 @@ const totalProceso =
 
 const totalAtendidos =
     document.getElementById('totalAtendidos');
+
+const modalSeguimiento = document.getElementById('modalSeguimiento');
+const idReporteSeguimiento = document.getElementById('idReporteSeguimiento');
+const detalleSeguimiento = document.getElementById('detalleSeguimiento');
+const responsableSeguimiento = document.getElementById('responsableSeguimiento');
+const btnGuardarSeguimiento = document.getElementById('btnGuardarSeguimiento');
+const btnCancelarSeguimiento = document.getElementById('btnCancelarSeguimiento');    
     
 const limpiarMensajeVacio = () => {
 
@@ -466,69 +473,13 @@ window.actualizarEstado = async (
 
 };
 
-window.registrarSeguimiento = async (idReporte) => {
+window.registrarSeguimiento = (idReporte) => {
 
-    const detalle = prompt(
-        'Ingrese el detalle del seguimiento'
-    );
+    idReporteSeguimiento.value = idReporte;
+    detalleSeguimiento.value = '';
+    responsableSeguimiento.value = '';
 
-    if (!detalle) {
-        return;
-    }
-
-    const responsable = prompt(
-        'Ingrese el responsable'
-    );
-
-    if (!responsable) {
-        return;
-    }
-
-    try {
-
-        const token =
-            localStorage.getItem('token');
-
-        const respuesta = await fetch(
-            `/api/reportes/seguimiento/${idReporte}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    detalle,
-                    responsable
-                })
-            }
-        );
-
-        const datos =
-            await respuesta.json();
-
-        if (!datos.ok) {
-
-            alert(datos.mensaje);
-            return;
-
-        }
-
-        alert(
-            'Seguimiento registrado correctamente'
-        );
-
-        cargarReportes();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            'Error registrando seguimiento'
-        );
-
-    }
+    modalSeguimiento.classList.remove('oculto');
 
 };
 
@@ -557,6 +508,61 @@ tablaReportes.addEventListener('change', (event) => {
     }
 
     actualizarEstado(select.dataset.id, select.value);
+
+});
+
+btnCancelarSeguimiento.addEventListener('click', () => {
+
+    modalSeguimiento.classList.add('oculto');
+
+});
+
+btnGuardarSeguimiento.addEventListener('click', async () => {
+
+    try {
+
+        const token = localStorage.getItem('token');
+
+        const respuesta = await fetch(
+            `/api/reportes/seguimiento/${idReporteSeguimiento.value}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    detalle: detalleSeguimiento.value,
+                    responsable: responsableSeguimiento.value
+                })
+            }
+        );
+
+        const datos = await respuesta.json();
+
+        if (!datos.ok) {
+
+            alert(datos.mensaje);
+            return;
+
+        }
+
+        modalSeguimiento.classList.add('oculto');
+
+        detalleSeguimiento.value = '';
+        responsableSeguimiento.value = '';
+
+        alert('Seguimiento registrado correctamente');
+
+        cargarReportes();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert('Error registrando seguimiento');
+
+    }
 
 });
 

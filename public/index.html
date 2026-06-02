@@ -194,6 +194,53 @@
         font-weight: bold;
     }
 
+    .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+    }
+
+    .modal.oculto {
+        display: none;
+    }
+
+    .modal-contenido {
+        background: white;
+        width: 520px;
+        max-width: 92%;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-contenido h2 {
+        margin-top: 0;
+    }
+
+    .modal-contenido textarea,
+    .modal-contenido input {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .modal-acciones {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .btn-secundario {
+        background: #64748b;
+    }
+
+    .btn-secundario:hover {
+        background: #475569;
+    }    
+
     </style>
 </head>
 <body>
@@ -332,6 +379,35 @@
             </div>
         </section>
     </main>
+
+    <div class="modal oculto" id="modalSeguimiento">
+        <div class="modal-contenido">
+            <h2>Registrar seguimiento</h2>
+
+            <input type="hidden" id="idReporteSeguimiento">
+
+            <textarea
+                id="detalleSeguimiento"
+                placeholder="Detalle del seguimiento"
+            ></textarea>
+
+            <input
+                type="text"
+                id="responsableSeguimiento"
+                placeholder="Responsable"
+            >
+
+            <div class="modal-acciones">
+                <button id="btnGuardarSeguimiento">
+                    Guardar seguimiento
+                </button>
+
+                <button id="btnCancelarSeguimiento" class="btn-secundario">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/app.js"></script>
