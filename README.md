@@ -868,6 +868,17 @@ Seguridad:
 
 ---
 
+## v5.5.1 — Ranking de Incidencias por Ubicación
+
+* Ranking de ubicaciones con mayor cantidad de incidencias
+* Visualización gráfica mediante barras HTML/CSS
+* Estadísticas generadas desde datos reales almacenados en Supabase
+* Integración con Dashboard Analítico
+* Compatible con Helmet CSP
+* Actualización automática durante la carga de reportes
+
+---
+
 # Commits Semánticos
 
 Ejemplos:
