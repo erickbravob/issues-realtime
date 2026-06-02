@@ -833,6 +833,12 @@ Seguridad:
 
 ---
 
+## v5.3.0
+
+* Búsqueda y filtros avanzados
+
+---
+
 # Commits Semánticos
 
 Ejemplos:
