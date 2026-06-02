@@ -89,6 +89,9 @@ const panelUsuarios =
 const tablaUsuarios =
     document.getElementById('tablaUsuarios');
 
+    const graficoUsuarios =
+    document.getElementById('graficoUsuarios');
+
 let reportesOriginales = [];
 
 socket.on('connect', () => {
@@ -425,11 +428,57 @@ const cargarUsuarios = async () => {
 
         });
 
+        actualizarGraficoUsuarios(datos.data);
+
     } catch (error) {
 
         console.error(error);
 
     }
+
+};
+
+const actualizarGraficoUsuarios = (usuarios) => {
+
+    if (!usuarios || usuarios.length === 0) {
+
+        graficoUsuarios.innerHTML =
+            '<p class="vacio">No hay datos disponibles.</p>';
+
+        return;
+
+    }
+
+    const maximo = Math.max(
+        ...usuarios.map(usuario => usuario._count.reportes),
+        1
+    );
+
+    graficoUsuarios.innerHTML = '';
+
+    usuarios.forEach((usuario) => {
+
+        const cantidad =
+            usuario._count.reportes;
+
+        const fila =
+            document.createElement('div');
+
+        fila.className =
+            'barra-estado';
+
+        fila.innerHTML = `
+            <strong>${usuario.nombre}</strong>
+            <div
+                class="barra"
+                style="width:${(cantidad / maximo) * 100}%"
+            ></div>
+            <span>${cantidad}</span>
+        `;
+
+        graficoUsuarios.appendChild(fila);
+
+    });
 
 };
 
