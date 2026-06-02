@@ -54,7 +54,13 @@ const idReporteSeguimiento = document.getElementById('idReporteSeguimiento');
 const detalleSeguimiento = document.getElementById('detalleSeguimiento');
 const responsableSeguimiento = document.getElementById('responsableSeguimiento');
 const btnGuardarSeguimiento = document.getElementById('btnGuardarSeguimiento');
-const btnCancelarSeguimiento = document.getElementById('btnCancelarSeguimiento');    
+const btnCancelarSeguimiento = document.getElementById('btnCancelarSeguimiento');
+
+const buscarReporte =
+    document.getElementById('buscarReporte');
+
+const filtroEstado =
+    document.getElementById('filtroEstado');
     
 const limpiarMensajeVacio = () => {
 
@@ -65,6 +71,8 @@ const limpiarMensajeVacio = () => {
     }
 
 };
+
+let reportesOriginales = [];
 
 socket.on('connect', () => {
     estado.textContent = 'Conectado al servidor en tiempo real';
@@ -308,6 +316,7 @@ const cargarReportes = async () => {
         const respuesta = await fetch('/api/reportes');
 
         const datos = await respuesta.json();
+        reportesOriginales = datos.data || [];
 
         actualizarDashboard(datos.data || []);
 
@@ -335,61 +344,7 @@ const cargarReportes = async () => {
 
         }
 
-        tablaReportes.innerHTML = '';
-
-        datos.data.forEach((reporte) => {
-
-            const fila = document.createElement('tr');
-
-            fila.innerHTML = `
-                <td>${reporte.id}</td>
-                <td>${reporte.titulo}</td>
-                <td>${reporte.ubicacion}</td>
-                <td>${reporte.categoria?.nombre || 'Sin categoría'}</td>
-                <td>
-
-                <select
-                    class="selectEstado"
-                    data-id="${reporte.id}"
-                >
-                    <option
-                        value="Pendiente"
-                        ${reporte.estado === 'Pendiente' ? 'selected' : ''}
-                    >
-                        Pendiente
-                    </option>
-
-                    <option
-                        value="En Proceso"
-                        ${reporte.estado === 'En Proceso' ? 'selected' : ''}
-                    >
-                        En Proceso
-                    </option>
-
-                    <option
-                        value="Atendido"
-                        ${reporte.estado === 'Atendido' ? 'selected' : ''}
-                    >
-                        Atendido
-                    </option>
-
-                </select>
-
-            </td>
-                <td>${reporte.usuario?.nombre || 'Sin usuario'}</td>
-                <td>
-                    <button
-                        class="btnSeguimiento"
-                        data-id="${reporte.id}"
-                    >
-                        Seguimiento
-                    </button>
-                </td>
-            `;
-
-            tablaReportes.appendChild(fila);
-
-        });
+    renderizarTabla(reportesOriginales);
 
     } catch (error) {
 
@@ -472,6 +427,110 @@ window.actualizarEstado = async (
     totalAtendidos.textContent = atendidos;
 
 };
+
+        const aplicarFiltros = () => {
+
+            const textoBusqueda =
+                buscarReporte.value
+                    .toLowerCase()
+                    .trim();
+
+            const estadoSeleccionado =
+                filtroEstado.value;
+
+            const reportesFiltrados =
+                reportesOriginales.filter((reporte) => {
+
+                    const coincideTexto =
+
+                        reporte.titulo?.toLowerCase().includes(textoBusqueda)
+
+                        ||
+
+                        reporte.ubicacion?.toLowerCase().includes(textoBusqueda)
+
+                        ||
+
+                        reporte.usuario?.nombre?.toLowerCase().includes(textoBusqueda);
+
+                    const coincideEstado =
+
+                        !estadoSeleccionado ||
+
+                        reporte.estado === estadoSeleccionado;
+
+                    return (
+                        coincideTexto &&
+                        coincideEstado
+                    );
+
+                });
+
+            renderizarTabla(reportesFiltrados);
+
+        };
+
+        const renderizarTabla = (reportes) => {
+
+        tablaReportes.innerHTML = '';
+
+        reportes.forEach((reporte) => {
+
+            const fila = document.createElement('tr');
+
+            fila.innerHTML = `
+                <td>${reporte.id}</td>
+                <td>${reporte.titulo}</td>
+                <td>${reporte.ubicacion}</td>
+                <td>${reporte.categoria?.nombre || 'Sin categoría'}</td>
+                <td>
+
+                    <select
+                        class="selectEstado"
+                        data-id="${reporte.id}"
+                    >
+                        <option
+                            value="Pendiente"
+                            ${reporte.estado === 'Pendiente' ? 'selected' : ''}
+                        >
+                            Pendiente
+                        </option>
+
+                        <option
+                            value="En Proceso"
+                            ${reporte.estado === 'En Proceso' ? 'selected' : ''}
+                        >
+                            En Proceso
+                        </option>
+
+                        <option
+                            value="Atendido"
+                            ${reporte.estado === 'Atendido' ? 'selected' : ''}
+                        >
+                            Atendido
+                        </option>
+
+                    </select>
+
+                </td>
+
+                <td>${reporte.usuario?.nombre || 'Sin usuario'}</td>
+
+                <td>
+                    <button
+                        class="btnSeguimiento"
+                        data-id="${reporte.id}"
+                    >
+                        Seguimiento
+                    </button>
+                </td>
+            `;
+
+            tablaReportes.appendChild(fila);
+
+        });
+
+    };
 
 window.registrarSeguimiento = (idReporte) => {
 
@@ -565,6 +624,16 @@ btnGuardarSeguimiento.addEventListener('click', async () => {
     }
 
 });
+
+buscarReporte.addEventListener(
+    'input',
+    aplicarFiltros
+);
+
+filtroEstado.addEventListener(
+    'change',
+    aplicarFiltros
+);
 
 mostrarUsuario();
 

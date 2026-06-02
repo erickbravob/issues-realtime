@@ -239,6 +239,20 @@
 
     .btn-secundario:hover {
         background: #475569;
+    }
+
+    .filtros {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    }
+
+    .filtros input {
+        flex: 1;
+    }
+
+    .filtros select {
+        min-width: 180px;
     }    
 
     </style>
@@ -343,6 +357,36 @@
 
         <section class="panel oculto" id="panelReportes">
             <h2>Historial de Reportes</h2>
+
+        <div class="filtros">
+
+            <input
+                type="text"
+                id="buscarReporte"
+                placeholder="Buscar por título, ubicación o usuario"
+            >
+
+            <select id="filtroEstado">
+
+                <option value="">
+                    Todos los estados
+                </option>
+
+                <option value="Pendiente">
+                    Pendiente
+                </option>
+
+                <option value="En Proceso">
+                    En Proceso
+                </option>
+
+                <option value="Atendido">
+                    Atendido
+                </option>
+
+            </select>
+
+        </div>
 
             <button id="btnCargarReportes">
                 Actualizar listado
