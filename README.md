@@ -857,6 +857,17 @@ Seguridad:
 
 ---
 
+## v5.5.0 — Dashboard Analítico
+
+* Ranking de incidencias por categoría
+* Visualización gráfica de categorías más reportadas
+* Estadísticas generadas desde datos reales
+* Integración con dashboard ejecutivo
+* Compatible con Helmet CSP
+* Actualización automática en cada consulta de reportes
+
+---
+
 # Commits Semánticos
 
 Ejemplos:
