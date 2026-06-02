@@ -276,6 +276,7 @@ btnCrearReporte.addEventListener('click', async () => {
         ubicacionReporte.value = '';
 
         alert('Reporte registrado correctamente');
+        cargarReportes();
 
     } catch (error) {
 
@@ -516,6 +517,8 @@ window.registrarSeguimiento = async (idReporte) => {
         alert(
             'Seguimiento registrado correctamente'
         );
+
+        cargarReportes();
 
     } catch (error) {
 
