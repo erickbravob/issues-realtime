@@ -255,6 +255,38 @@
         min-width: 180px;
     }    
 
+    .ultimos-reportes {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .reporte-reciente {
+        padding: 14px;
+        border-left: 5px solid #2563eb;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .grafico-estados {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+    }
+
+    .barra-estado {
+        display: grid;
+        grid-template-columns: 120px 1fr 40px;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .barra {
+        height: 24px;
+        background: #2563eb;
+        border-radius: 8px;
+    }
+
     </style>
 </head>
 <body>
@@ -296,6 +328,16 @@
                 </div>
 
             </div>
+
+            <h2>Últimos reportes registrados</h2>
+
+            <div id="ultimosReportes" class="ultimos-reportes">
+                <p class="vacio">No hay reportes recientes.</p>
+            </div>
+
+            <h2>Distribución por Estado</h2>
+
+            <div id="graficoEstados" class="grafico-estados"></div>
 
         </section>
 

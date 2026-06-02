@@ -56,6 +56,8 @@ const responsableSeguimiento = document.getElementById('responsableSeguimiento')
 const btnGuardarSeguimiento = document.getElementById('btnGuardarSeguimiento');
 const btnCancelarSeguimiento = document.getElementById('btnCancelarSeguimiento');
 
+const ultimosReportes = document.getElementById('ultimosReportes');
+
 const buscarReporte =
     document.getElementById('buscarReporte');
 
@@ -71,6 +73,9 @@ const limpiarMensajeVacio = () => {
     }
 
 };
+
+const graficoEstadosCanvas =
+    document.getElementById('graficoEstados');
 
 let reportesOriginales = [];
 
@@ -319,6 +324,8 @@ const cargarReportes = async () => {
         reportesOriginales = datos.data || [];
 
         actualizarDashboard(datos.data || []);
+        actualizarUltimosReportes(datos.data || []);
+        actualizarGraficoEstados(datos.data || []);
 
         if (!datos.ok) {
 
@@ -425,6 +432,83 @@ window.actualizarEstado = async (
     totalPendientes.textContent = pendientes;
     totalProceso.textContent = enProceso;
     totalAtendidos.textContent = atendidos;
+
+};
+
+const actualizarUltimosReportes = (reportes) => {
+
+    const ultimos = reportes.slice(0, 5);
+
+    if (ultimos.length === 0) {
+
+        ultimosReportes.innerHTML = `
+            <p class="vacio">No hay reportes recientes.</p>
+        `;
+
+        return;
+
+    }
+
+    ultimosReportes.innerHTML = '';
+
+    ultimos.forEach((reporte) => {
+
+        const div = document.createElement('div');
+        div.className = 'reporte-reciente';
+
+        div.innerHTML = `
+            <strong>${reporte.titulo}</strong>
+            <div class="detalle">Ubicación: ${reporte.ubicacion}</div>
+            <div class="detalle">Estado: ${reporte.estado}</div>
+            <div class="detalle">Registrado por: ${reporte.usuario?.nombre || 'Sin usuario'}</div>
+        `;
+
+        ultimosReportes.appendChild(div);
+
+    });
+
+};
+
+const actualizarGraficoEstados = (reportes) => {
+
+    const pendientes = reportes.filter(
+        reporte => reporte.estado === 'Pendiente'
+    ).length;
+
+    const enProceso = reportes.filter(
+        reporte => reporte.estado === 'En Proceso'
+    ).length;
+
+    const atendidos = reportes.filter(
+        reporte => reporte.estado === 'Atendido'
+    ).length;
+
+    const maximo = Math.max(
+        pendientes,
+        enProceso,
+        atendidos,
+        1
+    );
+
+    graficoEstadosCanvas.innerHTML = `
+        <div class="barra-estado">
+            <strong>Pendientes</strong>
+            <div class="barra" style="width: ${(pendientes / maximo) * 100}%"></div>
+            <span>${pendientes}</span>
+        </div>
+
+        <div class="barra-estado">
+            <strong>En Proceso</strong>
+            <div class="barra" style="width: ${(enProceso / maximo) * 100}%"></div>
+            <span>${enProceso}</span>
+        </div>
+
+        <div class="barra-estado">
+            <strong>Atendidos</strong>
+            <div class="barra" style="width: ${(atendidos / maximo) * 100}%"></div>
+            <span>${atendidos}</span>
+        </div>
+    `;
 
 };
 
