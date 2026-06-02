@@ -80,6 +80,9 @@ const graficoEstadosCanvas =
 const graficoCategorias =
     document.getElementById('graficoCategorias');
 
+const graficoUbicaciones =
+    document.getElementById('graficoUbicaciones');
+
 let reportesOriginales = [];
 
 socket.on('connect', () => {
@@ -330,6 +333,7 @@ const cargarReportes = async () => {
         actualizarUltimosReportes(datos.data || []);
         actualizarGraficoEstados(datos.data || []);
         actualizarGraficoCategorias(datos.data || []);
+        actualizarGraficoUbicaciones(datos.data || []);
 
         if (!datos.ok) {
 
@@ -573,6 +577,64 @@ const actualizarGraficoEstados = (reportes) => {
         });
 
     };
+
+    const actualizarGraficoUbicaciones = (reportes) => {
+
+    const ubicaciones = {};
+
+    reportes.forEach((reporte) => {
+
+        const nombreUbicacion =
+            reporte.ubicacion ||
+            'Sin ubicación';
+
+        ubicaciones[nombreUbicacion] =
+            (ubicaciones[nombreUbicacion] || 0) + 1;
+
+    });
+
+    const datos =
+        Object.entries(ubicaciones);
+
+    if (datos.length === 0) {
+
+        graficoUbicaciones.innerHTML =
+            '<p class="vacio">No hay datos disponibles.</p>';
+
+        return;
+
+    }
+
+    const maximo =
+        Math.max(
+            ...datos.map(item => item[1]),
+            1
+        );
+
+    graficoUbicaciones.innerHTML = '';
+
+    datos.forEach(([nombre, cantidad]) => {
+
+        const fila =
+            document.createElement('div');
+
+        fila.className =
+            'barra-estado';
+
+        fila.innerHTML = `
+            <strong>${nombre}</strong>
+            <div
+                class="barra"
+                style="width:${(cantidad / maximo) * 100}%"
+            ></div>
+            <span>${cantidad}</span>
+        `;
+
+        graficoUbicaciones.appendChild(fila);
+
+    });
+
+};
 
         const aplicarFiltros = () => {
 
