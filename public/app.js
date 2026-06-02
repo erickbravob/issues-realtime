@@ -474,6 +474,20 @@ window.actualizarEstado = async (
 
         tablaReportes.innerHTML = '';
 
+            if (reportes.length === 0) {
+
+                tablaReportes.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            No se encontraron reportes.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+
+            }
+
         reportes.forEach((reporte) => {
 
             const fila = document.createElement('tr');

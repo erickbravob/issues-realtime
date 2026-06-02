@@ -835,7 +835,13 @@ Seguridad:
 
 ## v5.3.0
 
-* Búsqueda y filtros avanzados
+* Búsqueda de reportes por título
+* Búsqueda de reportes por ubicación
+* Búsqueda de reportes por usuario
+* Filtro por estado
+* Filtrado dinámico sin recarga de página
+* Integración con dashboard existente
+* Mejora de experiencia de usuario
 
 ---
 
