@@ -136,107 +136,137 @@ const obtenerReportePorId = async (req, res) => {
 
 const crearReporte = async (req, res) => {
 
-    const {
-        titulo,
-        descripcion,
-        ubicacion,
-        categoria,
-        estado,
-        usuarioNombre,
-        usuarioEmail
-    } = req.body;
+    try {
 
-    if (!titulo || !descripcion || !ubicacion || !categoria || !estado || !usuarioNombre || !usuarioEmail) {
-
-        return res.status(400).json({
-            ok: false,
-            mensaje: 'Todos los campos son obligatorios'
-        });
-
-    }
-
-    const usuario = await prisma.usuario.upsert({
-        where: {
-            email: usuarioEmail
-        },
-        update: {
-            nombre: usuarioNombre
-        },
-        create: {
-            nombre: usuarioNombre,
-            email: usuarioEmail
-        }
-    });
-
-    const categoriaRegistro = await prisma.categoria.upsert({
-        where: {
-            nombre: categoria
-        },
-        update: {},
-        create: {
-            nombre: categoria
-        }
-    });
-
-    const nuevoReporte = await prisma.reporte.create({
-        data: {
+        const {
             titulo,
             descripcion,
             ubicacion,
+            categoria,
             estado,
-            usuarioId: usuario.id,
-            categoriaId: categoriaRegistro.id
-        },
-        include: {
-            usuario: true,
-            categoria: true
+            usuarioNombre,
+            usuarioEmail
+        } = req.body;
+
+        if (!titulo || !descripcion || !ubicacion || !categoria || !estado || !usuarioNombre || !usuarioEmail) {
+
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Todos los campos son obligatorios'
+            });
+
         }
-    });
 
-await eliminarCachePorPatron('reportes:*');
+        const usuario = await prisma.usuario.upsert({
+            where: {
+                email: usuarioEmail
+            },
+            update: {
+                nombre: usuarioNombre
+            },
+            create: {
+                nombre: usuarioNombre,
+                email: usuarioEmail
+            }
+        });
 
-const reporteConEjecutor = {
-    ...reporteActualizado,
-    usuarioEjecutor: {
-        id: req.usuario.id,
-        nombre: req.usuario.nombre,
-        email: req.usuario.email
+        const categoriaRegistro = await prisma.categoria.upsert({
+            where: {
+                nombre: categoria
+            },
+            update: {},
+            create: {
+                nombre: categoria
+            }
+        });
+
+        const nuevoReporte = await prisma.reporte.create({
+            data: {
+                titulo,
+                descripcion,
+                ubicacion,
+                estado,
+                usuarioId: usuario.id,
+                categoriaId: categoriaRegistro.id
+            },
+            include: {
+                usuario: true,
+                categoria: true
+            }
+        });
+
+        const usuarioEjecutor = req.usuario || req.user || {
+            id: usuario.id,
+            nombre: usuario.nombre,
+            email: usuario.email
+        };
+
+        const reporteConEjecutor = {
+            ...nuevoReporte,
+            usuarioEjecutor: {
+                id: usuarioEjecutor.id,
+                nombre: usuarioEjecutor.nombre,
+                email: usuarioEjecutor.email
+            }
+        };
+
+        try {
+
+            await eliminarCachePorPatron('reportes:*');
+
+            await publicarEvento(
+                'infra:reportes',
+                'infra:reporte:creado',
+                reporteConEjecutor
+            );
+
+            await publicarEvento(
+                'infra:notificaciones',
+                'infra:notificacion:mantenimiento',
+                {
+                    mensaje: 'Nuevo reporte de infraestructura registrado',
+                    reporte: reporteConEjecutor
+                }
+            );
+
+            const io = req.app.get('io');
+
+            if (io) {
+
+                io.emit('reporte:creado', {
+                    tipo: 'infra:reporte:creado',
+                    payload: reporteConEjecutor,
+                    timestamp: new Date().toISOString(),
+                    version: '1.0'
+                });
+
+            }
+
+        } catch (errorEvento) {
+
+            console.error(
+                'Reporte creado, pero falló la notificación:',
+                errorEvento.message
+            );
+
+        }
+
+        return res.status(201).json({
+            ok: true,
+            mensaje: 'Reporte creado correctamente',
+            data: nuevoReporte
+        });
+
+    } catch (error) {
+
+        console.error('Error creando reporte:', error.message);
+
+        return res.status(500).json({
+            ok: false,
+            mensaje: 'Error interno al crear reporte'
+        });
+
     }
-};
-
-await publicarEvento(
-    'infra:reportes',
-    'infra:reporte:estado_actualizado',
-    reporteConEjecutor
-);
-
-await publicarEvento(
-    'infra:notificaciones',
-    'infra:notificacion:mantenimiento',
-    {
-        mensaje: 'Estado del reporte actualizado',
-        reporte: reporteConEjecutor
-    }
-);
-
-const io = req.app.get('io');
-
-if (io) {
-
-    io.emit('reporte:estado_actualizado', {
-        tipo: 'infra:reporte:estado_actualizado',
-        payload: reporteConEjecutor,
-        timestamp: new Date().toISOString(),
-        version: '1.0'
-    });
-
-}
-
-    res.status(201).json({
-        ok: true,
-        mensaje: 'Reporte creado correctamente',
-        data: nuevoReporte
-    });
 
 };
 
