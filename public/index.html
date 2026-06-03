@@ -1,242 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Issues Realtime - CampusFix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issues RealTime</title>
+
     <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
 
-    <header>
-        <h1>Issues Realtime</h1>
-        <p>Sistema de reportes de infraestructura universitaria con notificaciones en tiempo real</p>
-    </header>
+    <!-- LOGIN -->
 
-    <main>
-        <div class="estado" id="estado">
-            Conectando con Socket.IO...
-        </div>
+    <section id="pantallaLogin">
 
-        <section class="panel oculto" id="panelDashboard">
+        <header>
+            <h1>Issues RealTime</h1>
+            <p>Sistema de Reportes de Infraestructura Universitaria</p>
+        </header>
 
-            <h2>Indicadores Generales</h2>
+        <main class="login-main">
 
-            <div class="dashboard">
+            <section class="panel" id="panelLogin">
 
-                <div class="tarjeta">
-                    <h3>Total</h3>
-                    <span id="totalReportes">0</span>
+                <h2>Acceso al Sistema</h2>
+
+                <div class="formulario">
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Correo electrónico"
+                        value="erick@upds.edu.bo"
+                    >
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Contraseña"
+                        value="clave123"
+                    >
+
+                    <button id="btnLogin">
+                        Iniciar Sesión
+                    </button>
+
                 </div>
 
-                <div class="tarjeta">
-                    <h3>Pendientes</h3>
-                    <span id="totalPendientes">0</span>
+                <p id="mensajeLogin" class="mensaje"></p>
+
+            </section>
+
+        </main>
+
+    </section>
+
+    <!-- APLICACION -->
+
+    <section id="appPrincipal" class="oculto">
+
+        <header>
+
+            <h1>Issues RealTime</h1>
+
+            <p>
+                Sistema de Reportes de Infraestructura Universitaria
+            </p>
+
+        </header>
+
+        <section
+            class="panel oculto"
+            id="panelUsuario"
+        >
+
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:20px;
+                "
+            >
+
+                <div>
+
+                    <strong>Usuario:</strong>
+
+                    <span id="usuarioActivo"></span>
+
                 </div>
 
-                <div class="tarjeta">
-                    <h3>En Proceso</h3>
-                    <span id="totalProceso">0</span>
-                </div>
-
-                <div class="tarjeta">
-                    <h3>Atendidos</h3>
-                    <span id="totalAtendidos">0</span>
-                </div>
-
-            </div>
-
-            <h2>Últimos reportes registrados</h2>
-
-            <div id="ultimosReportes" class="ultimos-reportes">
-                <p class="vacio">No hay reportes recientes.</p>
-            </div>
-
-            <h2>Distribución por Estado</h2>
-
-            <div id="graficoEstados" class="grafico-estados"></div>
-
-            <h2>Incidencias por Categoría</h2>
-
-            <div id="graficoCategorias" class="grafico-estados">
-                <p class="vacio">No hay datos disponibles.</p>
-            </div>
-
-            <h2>Incidencias por Ubicación</h2>
-
-            <div id="graficoUbicaciones" class="grafico-estados">
-                <p class="vacio">No hay datos disponibles.</p>
-            </div>
-
-        </section>
-
-        <section class="panel" id="panelLogin">
-            <h2>Acceso al sistema</h2>
-
-            <div class="formulario">
-                <input type="email" id="email" placeholder="Correo electrónico" value="erick@upds.edu.bo">
-                <input type="password" id="password" placeholder="Contraseña" value="clave123">
-                <button id="btnLogin">Iniciar sesión</button>
-            </div>
-
-            <p id="mensajeLogin" class="mensaje"></p>
-        </section>
-
-        <section class="panel oculto" id="panelUsuario">
-            <h2>Usuario autenticado</h2>
-            <p id="usuarioActivo"></p>
-            <button id="btnLogout">Cerrar sesión</button>
-        </section>
-
-        <section class="panel oculto" id="panelNuevoReporte">
-
-        <h2>Registrar incidencia</h2>
-
-            <div class="formulario-reporte">
-
-                <input
-                    type="text"
-                    id="tituloReporte"
-                    placeholder="Título del reporte"
-                >
-
-                <input
-                    type="text"
-                    id="ubicacionReporte"
-                    placeholder="Ubicación"
-                >
-
-                <input
-                    type="text"
-                    id="categoriaReporte"
-                    placeholder="Categoría"
-                    value="Infraestructura"
-                >
-
-                <textarea
-                    id="descripcionReporte"
-                    placeholder="Descripción del problema"
-                ></textarea>
-
-                <button id="btnCrearReporte">
-                    Registrar Reporte
+                <button id="btnLogout">
+                    Cerrar Sesión
                 </button>
 
             </div>
 
         </section>
 
-        <section class="panel oculto" id="panelReportes">
-            <h2>Historial de Reportes</h2>
+        <nav class="menu-principal">
 
-        <div class="filtros">
-
-            <input
-                type="text"
-                id="buscarReporte"
-                placeholder="Buscar por título, ubicación o usuario"
-            >
-
-            <select id="filtroEstado">
-
-                <option value="">
-                    Todos los estados
-                </option>
-
-                <option value="Pendiente">
-                    Pendiente
-                </option>
-
-                <option value="En Proceso">
-                    En Proceso
-                </option>
-
-                <option value="Atendido">
-                    Atendido
-                </option>
-
-            </select>
-
-        </div>
-
-            <button id="btnCargarReportes">
-                Actualizar listado
+            <button id="btnModuloDashboard">
+                Dashboard
             </button>
 
-            <div class="tabla-contenedor">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Título</th>
-                            <th>Ubicación</th>
-                            <th>Categoría</th>
-                            <th>Estado</th>
-                            <th>Registrado por</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaReportes">
-                        <tr>
-                            <td colspan="6">No hay reportes cargados.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <button id="btnModuloReportes">
+                Reportes
+            </button>
+
+            <button id="btnModuloUsuarios">
+                Usuarios
+            </button>
+
+            <button id="btnModuloTiempoReal">
+                Tiempo Real
+            </button>
+
+        </nav>
+
+        <main>
+
+            <div class="estado" id="estado">
+                Conectando con Socket.IO...
             </div>
-        </section>
 
-        <section class="panel oculto" id="panelUsuarios">
+            <!-- DASHBOARD -->
 
-    <h2>Usuarios Registrados</h2>
+            <section
+                class="panel modulo activo"
+                id="panelDashboard"
+            >
 
-    <div class="tabla-contenedor">
+                <h2>Resumen Ejecutivo</h2>
 
-        <table>
+                <div class="dashboard">
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Fecha Registro</th>
-                    <th>Reportes</th>
-                </tr>
-            </thead>
+                    <div class="tarjeta">
 
-            <tbody id="tablaUsuarios">
+                        <h3>Total Reportes</h3>
 
-                <tr>
-                    <td colspan="5">
-                        No hay usuarios cargados.
-                    </td>
-                </tr>
+                        <span id="totalReportes">
+                            0
+                        </span>
 
-            </tbody>
+                    </div>
 
-        </table>
+                    <div class="tarjeta">
 
-        <h2>Usuarios más activos</h2>
+                        <h3>Pendientes</h3>
 
-<div id="graficoUsuarios" class="grafico-estados">
-    <p class="vacio">No hay datos disponibles.</p>
-</div>
+                        <span id="totalPendientes">
+                            0
+                        </span>
 
-    </div>
+                    </div>
 
-</section>
+                    <div class="tarjeta">
 
-        <section class="contenedor">
-            <div class="panel">
-                <h2>Panel de Notificaciones en Tiempo Real</h2>
-                <div id="notificaciones">
-                    <p class="vacio">Aún no se recibieron eventos en tiempo real.</p>
+                        <h3>En Proceso</h3>
+
+                        <span id="totalProceso">
+                            0
+                        </span>
+
+                    </div>
+
+                    <div class="tarjeta">
+
+                        <h3>Atendidos</h3>
+
+                        <span id="totalAtendidos">
+                            0
+                        </span>
+
+                    </div>
+
                 </div>
-            </div>
-        </section>
-    </main>
 
-    <div class="modal oculto" id="modalSeguimiento">
+                <br>
+
+                <h2>Últimos Reportes Registrados</h2>
+
+                <div
+                    id="ultimosReportes"
+                    class="ultimos-reportes"
+                >
+
+                    <p class="vacio">
+                        No hay reportes recientes.
+                    </p>
+
+                </div>
+
+                <br>
+
+                <h2>Distribución por Estado</h2>
+
+                <div
+                    id="graficoEstados"
+                    class="grafico-estados"
+                ></div>
+
+                <br>
+
+                <h2>Incidencias por Categoría</h2>
+
+                <div
+                    id="graficoCategorias"
+                    class="grafico-estados"
+                >
+
+                    <p class="vacio">
+                        No hay datos disponibles.
+                    </p>
+
+                </div>
+
+                <br>
+
+                <h2>Incidencias por Ubicación</h2>
+
+                <div
+                    id="graficoUbicaciones"
+                    class="grafico-estados"
+                >
+
+                    <p class="vacio">
+                        No hay datos disponibles.
+                    </p>
+
+                </div>
+
+            </section>
+
+            <!-- REPORTES -->
+
+            <section
+                class="panel oculto modulo"
+                id="panelNuevoReporte"
+            >
+
+                <h2>
+                    Registrar Nueva Incidencia
+                </h2>
+
+                <div class="formulario-reporte">
+
+                    <input
+                        type="text"
+                        id="tituloReporte"
+                        placeholder="Título del reporte"
+                    >
+
+                    <input
+                        type="text"
+                        id="ubicacionReporte"
+                        placeholder="Ubicación"
+                    >
+
+                    <input
+                        type="text"
+                        id="categoriaReporte"
+                        placeholder="Categoría"
+                        value="Infraestructura"
+                    >
+
+                    <textarea
+                        id="descripcionReporte"
+                        placeholder="Descripción del problema"
+                    ></textarea>
+
+                    <button id="btnCrearReporte">
+                        Registrar Reporte
+                    </button>
+
+                </div>
+
+            </section>
+
+            <section
+                class="panel oculto modulo"
+                id="panelReportes"
+            >
+
+                <h2>
+                    Historial de Reportes
+                </h2>
+
+                <div class="filtros">
+
+                    <input
+                        type="text"
+                        id="buscarReporte"
+                        placeholder="Buscar reporte"
+                    >
+
+                    <select id="filtroEstado">
+
+                        <option value="">
+                            Todos los estados
+                        </option>
+
+                        <option value="Pendiente">
+                            Pendiente
+                        </option>
+
+                        <option value="En Proceso">
+                            En Proceso
+                        </option>
+
+                        <option value="Atendido">
+                            Atendido
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button id="btnCargarReportes">
+                    Actualizar listado
+                </button>
+
+                <div class="tabla-contenedor">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Ubicación</th>
+                                <th>Categoría</th>
+                                <th>Estado</th>
+                                <th>Registrado por</th>
+                                <th>Acciones</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="tablaReportes">
+
+                            <tr>
+
+                                <td colspan="7">
+                                    No hay reportes cargados.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+            <!-- USUARIOS -->
+
+            <section
+                class="panel oculto modulo"
+                id="panelUsuarios"
+            >
+
+                <h2>
+                    Administración de Usuarios
+                </h2>
+
+                <p>
+                    Usuarios registrados y nivel de participación
+                    dentro del sistema.
+                </p>
+
+                <div class="tabla-contenedor">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Fecha Registro</th>
+                                <th>Reportes</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="tablaUsuarios">
+
+                            <tr>
+
+                                <td colspan="5">
+                                    No hay usuarios cargados.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <br>
+
+                <h2>
+                    Ranking de Usuarios
+                </h2>
+
+                <div
+                    id="graficoUsuarios"
+                    class="grafico-estados"
+                >
+
+                    <p class="vacio">
+                        No hay datos disponibles.
+                    </p>
+
+                </div>
+
+            </section>
+
+            <!-- TIEMPO REAL -->
+
+            <section
+                class="contenedor oculto modulo"
+                id="panelTiempoReal"
+            >
+
+                <div class="panel">
+
+                    <h2>
+                        Centro de Eventos en Tiempo Real
+                    </h2>
+
+                    <div id="notificaciones">
+
+                        <p class="vacio">
+                            Aún no se recibieron eventos en tiempo real.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </section>
+
+    <!-- MODAL SEGUIMIENTO -->
+
+    <div
+        class="modal oculto"
+        id="modalSeguimiento"
+    >
+
         <div class="modal-contenido">
-            <h2>Registrar seguimiento</h2>
 
-            <input type="hidden" id="idReporteSeguimiento">
+            <h2>
+                Registrar Seguimiento
+            </h2>
+
+            <input
+                type="hidden"
+                id="idReporteSeguimiento"
+            >
 
             <textarea
                 id="detalleSeguimiento"
@@ -250,19 +489,27 @@
             >
 
             <div class="modal-acciones">
+
                 <button id="btnGuardarSeguimiento">
-                    Guardar seguimiento
+                    Guardar Seguimiento
                 </button>
 
-                <button id="btnCancelarSeguimiento" class="btn-secundario">
+                <button
+                    id="btnCancelarSeguimiento"
+                    class="btn-secundario"
+                >
                     Cancelar
                 </button>
+
             </div>
+
         </div>
+
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/app.js"></script>
 
 </body>
-</html>
+
+</html>            

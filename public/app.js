@@ -58,11 +58,32 @@ const btnCancelarSeguimiento = document.getElementById('btnCancelarSeguimiento')
 
 const ultimosReportes = document.getElementById('ultimosReportes');
 
+const pantallaLogin =
+    document.getElementById('pantallaLogin');
+
+const appPrincipal =
+    document.getElementById('appPrincipal');
+
 const buscarReporte =
     document.getElementById('buscarReporte');
 
 const filtroEstado =
     document.getElementById('filtroEstado');
+
+    const btnModuloDashboard =
+    document.getElementById('btnModuloDashboard');
+
+const btnModuloReportes =
+    document.getElementById('btnModuloReportes');
+
+const btnModuloUsuarios =
+    document.getElementById('btnModuloUsuarios');
+
+const btnModuloTiempoReal =
+    document.getElementById('btnModuloTiempoReal');
+
+const panelTiempoReal =
+    document.getElementById('panelTiempoReal');
     
 const limpiarMensajeVacio = () => {
 
@@ -167,6 +188,18 @@ socket.on('reporte:seguimiento_creado', (evento) => {
 });
 
 socket.on('reporte:estado_actualizado', (evento) => {
+
+    console.log('EVENTO SOCKET');
+    console.log(evento);
+
+    mostrarNotificacionReporte(
+        'Estado del reporte actualizado',
+        evento
+    );
+
+});
+
+socket.on('reporte:estado_actualizado', (evento) => {
     mostrarNotificacionReporte('Estado del reporte actualizado', evento);
 });
 
@@ -222,25 +255,23 @@ function mostrarUsuario() {
         localStorage.getItem('usuario')
     );
 
-    if (!usuario) {
+if (!usuario) {
 
-        panelLogin.classList.remove('oculto');
-        panelUsuario.classList.add('oculto');
-        panelNuevoReporte.classList.add('oculto');
-        panelReportes.classList.add('oculto');
-        panelDashboard.classList.add('oculto');
-        panelUsuarios.classList.add('oculto');
+    pantallaLogin.classList.remove('oculto');
+    appPrincipal.classList.add('oculto');
 
-        return;
+    return;
 
-    }
+}
 
-    panelLogin.classList.add('oculto');
-    panelUsuario.classList.remove('oculto');
-    panelNuevoReporte.classList.remove('oculto');
-    panelReportes.classList.remove('oculto');
-    panelDashboard.classList.remove('oculto');
-    panelUsuarios.classList.remove('oculto');
+pantallaLogin.classList.add('oculto');
+appPrincipal.classList.remove('oculto');
+
+panelUsuario.classList.remove('oculto');
+mostrarModulo(
+    [panelDashboard],
+    btnModuloDashboard
+);
 
     cargarReportes();
     cargarUsuarios();
@@ -966,6 +997,103 @@ filtroEstado.addEventListener(
     'change',
     aplicarFiltros
 );
+
+const botonesModulo = [
+    btnModuloDashboard,
+    btnModuloReportes,
+    btnModuloUsuarios,
+    btnModuloTiempoReal
+];
+
+const limpiarBotonesModulo = () => {
+
+    botonesModulo.forEach((boton) => {
+
+        if (boton) {
+            boton.classList.remove('activo');
+        }
+
+    });
+
+};
+
+const ocultarModulos = () => {
+
+    [
+        panelDashboard,
+        panelNuevoReporte,
+        panelReportes,
+        panelUsuarios,
+        panelTiempoReal
+    ].forEach((panel) => {
+
+        if (panel) {
+            panel.classList.add('oculto');
+            panel.classList.remove('activo');
+        }
+
+    });
+
+};
+
+const mostrarModulo = (modulos, botonActivo) => {
+
+    ocultarModulos();
+    limpiarBotonesModulo();
+
+    modulos.forEach((modulo) => {
+
+        if (modulo) {
+            modulo.classList.remove('oculto');
+            modulo.classList.add('activo');
+        }
+
+    });
+
+    if (botonActivo) {
+        botonActivo.classList.add('activo');
+    }
+
+};
+
+btnModuloDashboard.addEventListener('click', () => {
+
+    mostrarModulo(
+        [panelDashboard],
+        btnModuloDashboard
+    );
+
+});
+
+btnModuloReportes.addEventListener('click', () => {
+
+    mostrarModulo(
+        [
+            panelNuevoReporte,
+            panelReportes
+        ],
+        btnModuloReportes
+    );
+
+});
+
+btnModuloUsuarios.addEventListener('click', () => {
+
+    mostrarModulo(
+        [panelUsuarios],
+        btnModuloUsuarios
+    );
+
+});
+
+btnModuloTiempoReal.addEventListener('click', () => {
+
+    mostrarModulo(
+        [panelTiempoReal],
+        btnModuloTiempoReal
+    );
+
+});
 
 mostrarUsuario();
 

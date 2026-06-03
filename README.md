@@ -904,6 +904,23 @@ Seguridad:
 
 ---
 
+## v6.0.0 — Arquitectura Frontend
+
+* Separación de estilos en archivo style.css
+* Eliminación de CSS embebido en index.html
+* Mejor organización del frontend
+* Preparación para módulos independientes
+* Compatible con Helmet CSP
+* Sin cambios funcionales en la aplicación
+
+---
+
+## v6.1.0 — Arquitectura Frontend
+
+* Mejora de visualizacion
+
+---
+
 # Commits Semánticos
 
 Ejemplos:

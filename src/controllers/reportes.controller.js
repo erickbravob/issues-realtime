@@ -193,54 +193,44 @@ const crearReporte = async (req, res) => {
         }
     });
 
-    await eliminarCachePorPatron('reportes:*');
+await eliminarCachePorPatron('reportes:*');
 
-    await publicarEvento(
-        'infra:reportes',
-        'infra:reporte:creado',
-        {
-            ...nuevoReporte,
-            usuarioEjecutor: {
-                id: req.usuario.id,
-                nombre: req.usuario.nombre,
-                email: req.usuario.email
-            }
-        }
-    );
-
-    await publicarEvento(
-        'infra:notificaciones',
-        'infra:notificacion:mantenimiento',
-        {
-            mensaje: 'Nuevo reporte de infraestructura registrado',
-            reporte: nuevoReporte,
-            usuarioEjecutor: {
-                id: req.usuario.id,
-                nombre: req.usuario.nombre,
-                email: req.usuario.email
-            }
-        }
-    );
-
-    const io = req.app.get('io');
-
-    if (io) {
-
-io.emit('reporte:creado', {
-    tipo: 'infra:reporte:creado',
-    payload: {
-        ...nuevoReporte,
-        usuarioEjecutor: {
-            id: req.usuario.id,
-            nombre: req.usuario.nombre,
-            email: req.usuario.email
-        }
-    },
-    timestamp: new Date().toISOString(),
-    version: '1.0'
-});
-
+const reporteConEjecutor = {
+    ...reporteActualizado,
+    usuarioEjecutor: {
+        id: req.usuario.id,
+        nombre: req.usuario.nombre,
+        email: req.usuario.email
     }
+};
+
+await publicarEvento(
+    'infra:reportes',
+    'infra:reporte:estado_actualizado',
+    reporteConEjecutor
+);
+
+await publicarEvento(
+    'infra:notificaciones',
+    'infra:notificacion:mantenimiento',
+    {
+        mensaje: 'Estado del reporte actualizado',
+        reporte: reporteConEjecutor
+    }
+);
+
+const io = req.app.get('io');
+
+if (io) {
+
+    io.emit('reporte:estado_actualizado', {
+        tipo: 'infra:reporte:estado_actualizado',
+        payload: reporteConEjecutor,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    });
+
+}
 
     res.status(201).json({
         ok: true,
@@ -575,18 +565,35 @@ const actualizarEstadoReporte = async (req, res) => {
         }
     );
 
-    const io = req.app.get('io');
+const usuarioEjecutor = req.usuario || req.user || null;
 
-    if (io) {
+const reporteSocket = {
+    ...reporteActualizado,
+    usuarioEjecutor: usuarioEjecutor
+        ? {
+            id: usuarioEjecutor.id,
+            nombre: usuarioEjecutor.nombre,
+            email: usuarioEjecutor.email
+        }
+        : {
+            id: null,
+            nombre: 'Usuario autenticado',
+            email: 'No disponible'
+        }
+};
 
-        io.emit('reporte:estado_actualizado', {
-            tipo: 'infra:reporte:estado_actualizado',
-            payload: reporteActualizado,
-            timestamp: new Date().toISOString(),
-            version: '1.0'
-        });
+const io = req.app.get('io');
 
-    }    
+if (io) {
+
+    io.emit('reporte:estado_actualizado', {
+        tipo: 'infra:reporte:estado_actualizado',
+        payload: reporteSocket,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    });
+
+}
 
     res.status(200).json({
         ok: true,
